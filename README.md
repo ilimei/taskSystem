@@ -4,7 +4,7 @@
 ### 使系统的开发的更工程化
 
 ### 开始应用
-1. 从github上克隆和这个应用,修改`server/config.js`
+* 从github上克隆和这个应用,修改`server/config.js`
 ```javascript
 module.exports={
 	db:{
@@ -22,14 +22,14 @@ module.exports={
 		database: 'coding'
 	},
 	sessionCookie:{
-        maxAge: 3600000
+		maxAge: 3600000
 	}
 }
 ```
-2. 在项目目录中以下命令
-```
+* 在项目目录中以下命令
+```shell
 npm install
 node build.js
 ```
-3. 打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
-4. 打开`http://localhost:8808/`,开始使用
+* 打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
+* 打开`http://localhost:8808/`,开始使用
