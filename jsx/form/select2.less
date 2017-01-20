@@ -1,0 +1,47 @@
+.noSelect{
+	
+}
+
+.icon_input{
+	position: relative;
+	.icon{
+		  position: absolute;
+		  top: 0.675rem;
+		  right: .75rem;
+	}
+}
+.select2{
+	position: relative;
+	.icon-remove{
+		color:red;
+		cursor: pointer;
+	}
+	.droppanel{
+		position: absolute;
+		z-index: 9999;
+		background: #fff;
+		width:100%;
+		border:1px solid #ccc;
+		box-shadow: 0 2px  4px 0 #ccc;
+		.info{
+			.noSelect();
+		}
+		.min_btn{
+			color:#ccc;
+			font-size:12px;
+		}
+		.listpanel{
+			overflow: auto;
+			max-height: 150px;
+			.item{
+				height: 30px;
+				line-height: 30px;
+				cursor: pointer;
+				&:hover{
+					background: #5897fb;
+					color:#fff;
+				}
+			}
+		}
+	}
+}

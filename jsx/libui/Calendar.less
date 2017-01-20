@@ -1,0 +1,52 @@
+/***
+ * Calendar class create by ZhangLiwei at 20:09
+**/
+.Calendar {
+	@boxSize:30px;
+	background: #fff;
+	width:@boxSize*7px+10px;
+	padding: 4px;
+	color:#333;
+	.noSelect();
+	&:after{
+		content:"";
+		clear:both;
+		display: block;
+	}
+	.header{
+		text-align: center;
+		line-height: @boxSize;
+		border-bottom: 1px;
+		.yearMonth{
+			margin:0 8px;
+		}
+		i{
+			padding: 0 5px;
+			margin:0 4px;
+			cursor:pointer;
+		}
+	}
+	.week,.day{
+		display: inline-block;
+		width:@boxSize;
+		height:@boxSize;
+		line-height: @boxSize;
+		float:left;
+		text-align: center;
+		cursor:default;
+	}
+	.day{
+		cursor:pointer;
+		&.prev{
+			color:#ccc;
+		}
+		&.next{
+			color:#ccc;
+		}
+		&.select{
+			border-radius: 100%;
+			background: #00a2d4;
+			color:#fff;
+		}
+	}
+}

@@ -1,0 +1,59 @@
+.Toolbar{
+	height: 60px;
+	min-height: 60px;
+	padding: 0;
+	z-index: 1000;
+	background:#fff;
+	box-shadow: 0 1px 0 1px rgba(0,0,0,.1);
+	.right-menu{
+		height:60px;
+		float:right;
+		color: rgba(0,0,0,.75);
+		font-size:1.2rem;
+	}
+	.center{
+		position: absolute;
+		height: 60px;
+		line-height: 60px;
+		font-size: 20px;
+		left:50%;
+		.mixtransform(translateX(-50%));
+	}
+	.left-menu{
+
+	}
+	.logo{
+		display: inline-block;
+		min-width: 80px;
+		text-align: center;
+		padding: 0 1rem;
+		height:60px;
+		line-height: 60px;
+		cursor:pointer;
+		&:hover{
+			background:@hoverColor;
+		}
+		img{
+			width:40px;
+			height:40px;
+		}
+	}
+	.item{
+		display: inline-block;
+		min-width: 60px;
+		text-align: center;
+		padding: 0 1rem;
+		height:60px;
+		line-height: 60px;
+		cursor:pointer;
+		&:hover{
+			background:@hoverColor;
+		}
+		img{
+			width:40px;
+			height:40px;
+			box-shadow:0 0 4px #f00;
+			border-radius:40px;
+		}
+	}
+}

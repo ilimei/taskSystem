@@ -1,0 +1,111 @@
+/***
+ * Users class create by ZhangLiwei at 10:27
+**/
+.Users {
+	flex:1;
+	&.pd{
+		padding: 30px 60px 0;
+	}
+	.userHeader{
+		font-size: 18px;
+		padding-bottom: 10px;
+		font-weight: 400;
+		border-bottom: 1px solid rgba(0,0,0,.1);
+		margin-bottom:10px;
+		.btnArea{
+			float: right;
+			display: inline-block;
+		}
+	}
+	.usersContainer{
+		&:after{
+			content:"";
+			clear: both;
+			display: block;
+		}
+	}
+	.UserItem{
+		background: #fff;
+		border:1px dashed #ccc;
+		float:left;
+		padding: 10px;
+		margin:10px;
+		cursor: pointer;
+		.avatar{
+			display: inline-block;
+			width:60px;
+			height:60px;
+			overflow: hidden;
+			border-radius: 100%;
+			img{
+				width:100%;
+				height:100%;
+			}
+		}
+		.name{
+			display: inline-block;
+			vertical-align: top;
+			margin:0 10px;
+		}
+		.creator{
+			font-size:12px;
+			color:#ccc;
+		}
+		&.active{
+			position: relative;
+			border:1px solid #c1e2b3;
+			@value:20px;
+			&:before{
+				content:"";
+				position: absolute;
+				top:0;
+				right:0;
+				border:@value solid #c1e2b3;
+				border-bottom:@value solid transparent;
+				border-left:@value solid transparent;
+			}
+			&:after{
+				font-family: FontAwesome;
+				font-weight: normal;
+				font-style: normal;
+				text-decoration: inherit;
+				-webkit-font-smoothing: antialiased;
+				content: "\f00c";
+				width:@value;
+				text-align: center;
+				color:#fff;
+				position: absolute;
+				top:0;
+				right:0;
+			}
+		}
+		&.unSelect{
+			position: relative;
+			border:1px solid #3967ff;
+			@value:20px;
+			&:before{
+				content:"";
+				position: absolute;
+				top:0;
+				right:0;
+				border:@value solid #3967ff;
+				border-bottom:@value solid transparent;
+				border-left:@value solid transparent;
+			}
+			&:after{
+				font-family: FontAwesome;
+				font-weight: normal;
+				font-style: normal;
+				text-decoration: inherit;
+				-webkit-font-smoothing: antialiased;
+				content: "\f06d";
+				width:@value;
+				text-align: center;
+				color:#fff;
+				position: absolute;
+				top:0;
+				right:0;
+			}
+		}
+	}
+}

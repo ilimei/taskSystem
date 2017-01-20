@@ -1,0 +1,93 @@
+/***
+ * TaskItem class create by ZhangLiwei at 19:08
+**/
+.TaskItem {
+	padding-bottom: 10px;
+	margin: 10px 0;
+	&:hover {
+		background: #fff;
+		border-radius: 5px;
+		.info-container .delTask {
+			display: block;
+		}
+	}
+	.info-container {
+		display: flex;
+		position: relative;
+		.done {
+			width: 40px;
+			text-align: center;
+			i {
+				cursor: pointer;
+			}
+		}
+		.center {
+			flex: 1;
+			.urgency {
+				display: inline-block;
+			}
+			.name {
+				margin-left: 4px;
+				display: inline-block;
+			}
+			.detail {
+				color: #FFA487;
+				font-size: 14px;
+				.calendar {
+					display: inline-block;
+					margin: 0 4px;
+					cursor: pointer;
+					i{
+						margin:0 4px;
+					}
+					&.overdue{
+						color: white;
+						background: red;
+						padding: 0 4px;
+						border-radius: 3px;
+					}
+					span {
+						vertical-align: text-top;
+					}
+					.calendar-container {
+						color: #333;
+						border: 0;
+					}
+				}
+				.creator {
+					display: inline-block;
+					margin: 0 4px;
+				}
+				.desc {
+					cursor: pointer;
+					display: inline-block;
+					margin: 0 4px;
+				}
+				.tag {
+					display: inline-block;
+					margin: 0 4px;
+				}
+			}
+		}
+		.executor {
+			padding: 10px 0 0 0;
+		}
+		.delTask {
+			position: absolute;
+			display: none;
+			cursor: pointer;
+			right: 0;
+			top: 50%;
+			right: -10px;
+			font-size: 20px;
+			color: #D95C5C !important;
+			.mixtransform(translateY(-50%));
+		}
+	}
+	.task-desc{
+		margin: 0 20px 0 40px;
+		border:1px solid #ccc;
+		padding: 10px;
+		border-radius: 5px;
+	}
+}

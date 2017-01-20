@@ -1,0 +1,32 @@
+@import "color.less";
+@import "scrollbar.less";
+@import "func.less";
+@import "coding.less";
+
+html,body{
+	font-family: 'Microsoft YaHei',"微软雅黑", 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	height:100%;
+	background: rgb(247,246,242);
+}
+
+.fullHeight{
+	position: fixed;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+}
+
+.no_select{
+	.noSelect();
+}
+
+.clickAble{
+	cursor:pointer;
+	&:hover{
+		background: #fafafa;
+	}
+}
+.lineThrough{
+	text-decoration: line-through;
+}

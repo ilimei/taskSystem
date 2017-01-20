@@ -1,0 +1,55 @@
+/***
+ * HelperMenu class create by ZhangLiwei at 13:13
+**/
+.HelperMenu {
+	width: 250px;
+	border-right:1px solid #ccc;
+	height:100%;
+	overflow-y:auto;
+	.headerItem{
+		font-size: 18px;
+		padding: 30px 25px 10px;
+		.title{
+			color:#000;
+		}
+		.desc{
+			margin: 5px 0;
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 16px;
+			color: #666;
+			word-wrap: break-word;
+			word-break: normal;
+		}
+	}
+	.lineTop{
+		border-top:1px solid #ccc;
+		padding-top: 10px;
+		margin-top:10px;
+	}
+	.listItem{
+		padding: 4px 25px;
+		display: block;
+		color:#333;
+		cursor:pointer;
+		text-decoration: none;
+		i{
+			margin:0 4px;
+			width:16px;
+			display: inline-block;
+			text-align: center;
+		}
+		&:hover{
+			background-color: rgba(0,0,0,.02);
+		}
+		&.active{
+			color:#333;
+			background: rgba(0,0,0,.08);
+		}
+	}
+	.helpHeader{
+		color:#333;
+		font-size:18px;
+		padding-left: 25px;
+	}
+}

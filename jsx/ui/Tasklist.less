@@ -1,0 +1,24 @@
+.TaskList{
+	.task-item{
+		border-bottom: 1px solid #f0f0f0;
+		font-size:14px;
+		line-height: 36px;
+		white-space: nowrap;
+		padding: 0 10px;
+		cursor:pointer;
+		&:hover{
+			background:#fafafa;
+		}
+		&:last-child{
+			border-bottom:0;
+		}
+		&.active{
+			background:#faf4f0;
+		}
+		& > i{
+			margin-right: 15px;
+			width:14px;
+			display: inline-block;
+		}
+	}
+}

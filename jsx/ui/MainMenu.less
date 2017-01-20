@@ -1,0 +1,32 @@
+/***
+ * MainMenu class create by ZhangLiwei at 11:17
+**/
+.MainMenu {
+	width: 80px!important;
+	height: 100%!important;
+	overflow-y: auto;
+	background-color: #333;
+	.Item{
+		text-align: center;
+		padding: 4px;
+		cursor:pointer;
+		padding: 0.5rem 0;
+		text-decoration: none;
+		display: block;
+		&.active{
+			background: #333*1.3;
+		}
+		&:hover{
+			background: #333*1.2;
+		}
+		.icon{
+			font-size:1.5rem;
+			line-height: 1.5rem;
+			color:#fff;
+		}
+		.text{
+			font-size:0.8rem;
+			color:#fff;
+		}
+	}
+}

@@ -1,0 +1,65 @@
+.DropIcon{
+	position: relative;//定位标准
+	&:hover{
+		.drop_panel{
+			display:block;
+		}
+	}
+	&.noHoverDrop{
+		&:hover{
+			.drop_panel{
+				display:none;
+			}
+		}
+	}
+	.drop_panel{
+		&.hide{
+			display: none;
+		}
+		position:absolute;
+		display:none;
+		border:1px solid @borderColor;
+		box-shadow: 0 1px 1px 2px rgba(0,0,0,.1);
+		background: #fff;
+		border-radius: 5px;
+		z-index:99;
+		left: 50%;//也是根据父元素宽度来的
+		.mixtransform(translateX(-50%));//根据元素本身宽度来的
+		&.visible{
+			display:block;
+		}
+		&:hover{
+			display:block;
+		}
+		//& > *{
+		//	position:relative;
+		//	z-index: 2;
+		//}
+		&:before{//构建一些 辅助线 或者样式
+			z-index:1;
+			content:"";//不写 就不展示
+			display:inline-block;
+			position:absolute;
+			width:8px;
+			height:8px;
+			background:#fff;
+			top:-5px;
+			border-left: 1px solid rgba(0,0,0,.1);
+			border-top: 1px solid rgba(0,0,0,.1);
+			left:50%;
+			.mixtransform(translateX(-50%) rotate(45deg));
+		}
+	}
+	&.right{
+		.drop_panel{
+			left:inherit;
+			right:0;
+			outline: none;
+			.mixtransform(translateX(0%));
+			border-radius:0;
+			&:before{
+				display:none;
+			}
+		}
+	}
+}

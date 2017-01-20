@@ -1,0 +1,38 @@
+/***
+ * ProjectDrop class create by ZhangLiwei at 11:08
+**/
+.ProjectDrop {
+	height:100%;
+	cursor:pointer;
+	.avatar{
+		display: inline-block;
+		width:35px;
+		height: 35px;
+		overflow: hidden;
+		border-radius: 100%;
+		vertical-align: middle;
+		img{
+			vertical-align: top;
+			width:100%;
+			height:100%;
+		}
+	}
+	.projectItem{
+		height:40px;
+		line-height: 30px;
+		padding: 2.5px 0;
+		padding-left: 10px;
+		text-align: left;
+		white-space: nowrap;
+		&:hover{
+			background: #f0f0f0;
+			cursor:pointer;
+		}
+		.userName{
+			display: inline-block;
+			line-height: 25px;
+			height:25px;
+			margin-left: 4px;
+		}
+	}
+}

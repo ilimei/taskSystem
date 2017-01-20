@@ -1,0 +1,22 @@
+/* 滚动条宽度 高度 */ 
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+/* 轨道样式 */ 
+::-webkit-scrollbar-track{
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: @scrollBarColor;
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: @scrollBarHoverColor;
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: @scrollBarActiveColor;
+}
