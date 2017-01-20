@@ -26,10 +26,10 @@ module.exports={
 	}
 }
 ```
-* 在项目目录中以下命令
+2. 在项目目录中以下命令
 ```
 npm install
 node build.js
 ```
-* 打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
-* 打开`http://localhost:8808/`,开始使用
+3. 打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
+4. 打开`http://localhost:8808/`,开始使用
