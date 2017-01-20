@@ -14,6 +14,7 @@ if (!global.App) {
         password: 'root',
         database: 'coding'
     });
+    log=console.log.bind(console);
 } else {
     pool = App.dbPool;
 }
@@ -24,7 +25,7 @@ function QueryPromise(sql, param) {
             let logIndex=0;
             log("execute sql "+sql.replace(/\?/g,function(matchStr,index){
                     return param[logIndex++];
-            }));
+                }));
             pool.query(sql, param, function (err, rows, fields) {
                 if (err) {
                     reject(err);
@@ -250,15 +251,21 @@ var Query = MakeClass({
     create: function () {
         let prevSql = "create table " + this._modal._tableName + "(";
         let endSql = ") default character set 'utf8'";
-        let sqlParam = this._modal._rule.reduce(function (prev, curr) {
+        var primaryKey=[];
+        let sqlParamArr = this._modal._rule.reduce(function (prev, curr) {
             if (curr.key) {
-                prev.push("`" + curr.id + "` " + curr.type + " primary key");
-            } else {
-                prev.push("`" + curr.id + "` " + curr.type);
+                primaryKey.push(curr.id)
             }
+            prev.push("`" + curr.id + "` " + curr.type);
             return prev;
-        }, []).join(",");
-        return QueryPromise(prevSql + sqlParam + endSql).then(function (obj) {
+        }, []);
+        if(primaryKey.length>1){
+            sqlParamArr.push(" primary key ("+primaryKey.join(",")+")");
+        }else if(primaryKey.length==1){
+            sqlParamArr.push(" primary key "+primaryKey[0]);
+        }
+        log(prevSql + sqlParamArr.join(",") + endSql)
+        return QueryPromise(prevSql + sqlParamArr.join(",") + endSql).then(function (obj) {
             return obj.rows;
         });
     },
