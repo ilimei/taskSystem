@@ -31,4 +31,5 @@ module.exports={
 npm install
 node build.js
 ```
-成功后 打开chrome浏览器访问`http://localhost:8808`
+成功后,打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
+安装成功后,打开`http://localhost:8808/`
