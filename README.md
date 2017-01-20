@@ -1,4 +1,4 @@
-# 任务系统[![build status](https://secure.travis-ci.org/thlorenz/browserify-shim.svg?branch=master)](http://travis-ci.org/thlorenz/browserify-shim)
+# 任务系统[![build status](https://secure.travis-ci.org/thlorenz/browserify-shim.svg?branch=master)](http://www.yanglimei.com)
 项目任务系统
 
 ### 使系统的开发的更工程化
