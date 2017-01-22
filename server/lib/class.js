@@ -2,12 +2,12 @@ function BaseClass(){
 }
 
 BaseClass.prototype.callSuper=function(name){
-	var superPrototype = this.constructor.super_;
-	if(superPrototype&&superPrototype.prototype){
-		this.constructor=superPrototype.prototype.constructor;
-		if(typeof superPrototype.prototype[name]=="function"){
+	var superClass = this.constructor._super_;
+	if(superClass&&superClass.prototype){
+		this.constructor=superClass.prototype.constructor;
+		if(typeof superClass.prototype[name]=="function"){
 			var args=Array.prototype.slice.call(arguments,1);
-			superPrototype.prototype[name].apply(this,args);
+            superClass.prototype[name].apply(this,args);
 		}
 		delete this.constructor;
 	}
@@ -15,13 +15,13 @@ BaseClass.prototype.callSuper=function(name){
 
 function createClass(obj,parent,name){
 	name=name||"Class";
-	var Class=eval("(function "+name+"(){\
-		if(typeof this.init==\"function\"){\
-			this.init.apply(this,arguments);\
-		}\
-	})");
+	var Class=eval(`(function ${name}(){
+		if(typeof this.init=="function"){
+			this.init.apply(this,arguments);
+		}
+	})`);
 	if(parent){
-		Class.super_=parent;
+		Class._super_=parent;
 		Class.prototype=Object.create(parent.prototype,{
 		    constructor: {
 		      value: Class,
@@ -40,9 +40,7 @@ function createClass(obj,parent,name){
 		    }
 		});
 	}
-	for(var i in obj){
-		Class.prototype[i]=obj[i];
-	}	
+	Class.prototype=Object.assign(Class.prototype,obj);
 	return Class;
 };
 
