@@ -31,8 +31,6 @@ var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: false}))
 // parse application/json
 app.use(bodyParser.json())
-// var multer=require("multer");
-// app.use(multer()); // for parsing multipart/form-data
 
 
 //指定静态资源(html css js image等)路径
