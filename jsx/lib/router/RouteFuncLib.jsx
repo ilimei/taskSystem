@@ -36,7 +36,6 @@ function matchPath(path, arr,param) {
     log(paths);
     log(arr);
     var testParam={};
-    var rePaths=[];
     for(var i=0,len=paths.length;i<len;i++) {
         var p = paths[i];
         var mp = arr[i];
