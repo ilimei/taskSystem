@@ -15,6 +15,7 @@ gulp.task("cleanBuild", ["stopServer"], function (cb, reject) {
     buildEnv.deleteFolderRecursive(buildEnv.buildPath + "/out/css");
     buildEnv.deleteFolderRecursive(buildEnv.buildPath + "/out/page");
     buildEnv.deleteFolderRecursive(buildEnv.buildPath + "/js");
+    buildEnv.deleteFolderRecursive(buildEnv.buildPath + "/pub");
     try {
         fs.unlink("timeMap.json", function () {
         });
