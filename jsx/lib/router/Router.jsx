@@ -1,10 +1,4 @@
 var React = require("react");
-function stepChild(children, cb) {
-    var nChildren = React.Children.toArray(children).map(function (v, index) {
-        return cb(v, index);
-    });
-    return nChildren;
-}
 var RouterLib=require("./RouteFuncLib");
 var RedirectRoute=require("./RedirectRoute");
 var {matchPath,log,rmEmptyPath}=RouterLib;
@@ -18,6 +12,22 @@ let clone = function (arr) {
 }
 
 var Router=React.createClass({
+    getInitialState:function(){
+        return {
+            _matchPath:"",
+            _routeUnMatchPath:[]
+        }
+    },
+    childContextTypes:{
+        _matchPath:React.PropTypes.string,
+        _routeUnMatchPath:React.PropTypes.array
+    },
+    getChildContext:function(){
+        return {
+            _matchPath:this.state._matchPath,
+            _routeUnMatchPath:this.state._routeUnMatchPath
+        };
+    },
     jumpTo:function(path){
         if(MatchObj.matchPath){
             history.pushState({},"",location.origin+MatchObj.matchPath+"/"+path);
@@ -58,11 +68,9 @@ var Router=React.createClass({
         MatchObj.matchPath=MatchObj.matchPath?(MatchObj.matchPath+"/"+_matchPath):_matchPath;
         props.routeParam=param;
         this.onSelect=onSelect;
-        props.route={
-            _matchPath:MatchObj.matchPath,
-            _routeUnMatchPath:clone(arr)
-        }
         MatchObj._routeUnMatchPath=arr;
+        this.state._matchPath=MatchObj.matchPath;
+        this.state._routeUnMatchPath=clone(arr);
         return React.createElement(component,props);
     },
     shouldComponentUpdate:function(){
