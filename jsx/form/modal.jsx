@@ -46,6 +46,9 @@ var Modal=React.createClass({
             "modal fade":true,
             "in":this.state.show
         });
+		if(this.props.className){
+			modalCls+=" "+this.props.className;
+		}
 		var modalDialogCls=CS({
             "modal-dialog":true,
             "modal-lg":this.props.lg,
