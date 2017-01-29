@@ -1,17 +1,4 @@
-var g=global;
-if(window){
-    g=window;
-}
-g.CS=function(obj){
-    var classes=[];
-    for(var i in obj){
-        if(obj.hasOwnProperty(i)&&obj[i]){
-            classes.push(i);
-        }
-    }
-    return classes.join(" ");
-}
-
+const g=window;
 
 const _WEEK=["周日","周一","周二","周三","周四","周五","周六"];
 const _DATE=["前天","昨天","今天","明天","后天"];
@@ -84,23 +71,38 @@ function WITCH_DAY(targetDate){
 }
 g.WITCH_DAY=WITCH_DAY;
 
-function GUID(){
-    var g = "";
-
+g.GUID=function(){
+    var gStr = "";
     var i = 32;
-
     while(i--){
-        g += Math.floor(Math.random()*16.0).toString(16);
+        gStr += Math.floor(Math.random()*16.0).toString(16);
     }
-
-    var str = g.slice(0, 8) + "-" + g.slice(8, 12) + "-" + g.slice(12, 16) + "-" + g.slice(16, 20) + "-" + g.slice(20,32);
-
+    var str = gStr.slice(0, 8);
+        str+="-";
+        str+=gStr.slice(8, 12);
+        str+="-";
+        str+=gStr.slice(12, 16);
+        str+="-";
+        str+=gStr.slice(16, 20);
+        str+="-";
+        str+=gStr.slice(20,32);
     return str;
 }
-g.GUID=GUID;
 
+g.CS=function(obj){
+    var classes=[];
+    for(var i in obj){
+        if(obj[i]){
+            classes.push(i);
+        }
+    }
+    return classes.join(" ");
+}
 /***
  * 延时执行 防止多次执行
+ * 以最后一次为准
+ * this.timerId=delayFunc(callback,300,this.timerId,param,this);
+ *
  * @param func  要被执行的function
  * @param delay 延时时间
  * @param timerId 上次返回的的timerId
@@ -124,8 +126,7 @@ String.prototype.trim=function(){
 // 例子：
 // (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
 // (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
-Date.prototype.Format = function(fmt)
-{ //author: meizz
+Date.prototype.Format = function(fmt) { //author: meizz
     var o = {
         "M+" : this.getMonth()+1,                 //月份
         "d+" : this.getDate(),                    //日
@@ -156,32 +157,56 @@ g.makeLen=function(v,len){
  * @type {{isString: Window._.isString, isArray: Window._.isArray, isRegExp: Window._.isRegExp, isObject: Window._.isObject, isFunction: Window._.isFunction, extend: Window._.extend}}
  * @private
  */
-g._={
-    isString:function(o){
-        return typeof o=="string";
+g._=Object.create({},{
+    isString:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(o){
+            return typeof o=="string";
+        }
     },
-    isArray:function(o){
-        return Array.isArray(o);
+    isArray:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(o){
+            return Array.isArray(o);
+        }
     },
-    isRegExp:function(o){
-        return o instanceof RegExp;
+    isRegExp:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(o){
+            return o instanceof RegExp;
+        }
     },
-    isObject:function(o){
-        return !this.isArray(o)&&!this.isRegExp(o)&&[typeof o=="object"];
+    isObject:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(o){
+            return !this.isArray(o)&&!this.isRegExp(o)&&(typeof o=="object");
+        }
     },
-    isFunction:function(o){
-        return typeof o=="function";
+    isFunction:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(o){
+            return typeof o=="function";
+        }
     },
-    extend:function(){
-        var obj={};
-        Array.prototype.map.call(arguments,function(v){
-            for(var i in v){
-                obj[i]=v[i];
-            }
-        });
-        return obj;
+    mixin:{
+        enumerable: true,
+        writable: false,
+        configurable: true,
+        value:function(){
+            return Object.assign.apply(arguments);
+        }
     }
-};
+});
 /***
  * 重写setTimeout
  * @type {*}
@@ -198,9 +223,7 @@ g.setTimeout=function(cb,time,obj){
  * @return {}  例如 { btn:[],head:[],default:[] }
  */
 g.CTA=function(children,arr){
-    if(!Array.isArray(children)){
-        children=[children];
-    }
+    children=React.Children.toArray(children);
     var re={"default":[]};
     arr.forEach(function(v){
         re[v]=[];
@@ -247,11 +270,3 @@ g.PostFormData=function(url,formData){
         xhr.send(formData);
     });
 }
-
-const store=require("./lib/store");
-
-store.set("loginUser",{
-    name:"",
-    nick_name:"",
-    avatar:"/headicon/01.png"
-});
