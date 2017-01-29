@@ -2,6 +2,7 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var Loader=require("../libui/Loader");
 require("./reactExtend");
+require("./stores/cacheAjax");
 
 var Main = React.createClass({
     displayName: 'Main',
