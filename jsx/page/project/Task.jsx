@@ -125,11 +125,10 @@ var Task = React.createClass({
         return <Split className="Task">
             <HelperMenu title="任务"
                         desc="按已完成和未完成的任务分类"
-                        data={this.state.data}
-                        route={this.props.route}>
+                        data={this.state.data}>
                 <div>
                     <div className="helpHeader">所有成员</div>
-                    <ListUsers projectId={this.props.projectId} route={this.props.route}/>
+                    <ListUsers projectId={this.props.projectId}/>
                 </div>
             </HelperMenu>
             <div className="TaskSubContainer">

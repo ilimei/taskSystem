@@ -11,13 +11,13 @@ var InputGroup=require("../../ui/InputGroup");
 var TaskUrgencyDrop=require("../../ui/TaskUrgencyDrop");
 var ListProjects=require("./ListProjects");
 var TaskItem=require("../../ui/TaskItem");
-var store=require("../../lib/store");
 var PageNation=require("../../libui/PageNation");
 var TaskDetail=require("../project/TaskDetail");
 
 var Tasks=React.createClass({
     getInitialState:function(){
         return {
+            ProjectMap:{},
             data:[],
             page:1,
             rows:5,
@@ -26,7 +26,7 @@ var Tasks=React.createClass({
     },
     getName:function(){
         var id=this.props.routeParam.id;
-        var ProjectMap=store.get("projectMap");
+        var {ProjectMap}=this.state;
         switch (id){
             case "done": return "已完成的";
             case "pending": return "未完成的";
@@ -71,12 +71,12 @@ var Tasks=React.createClass({
             this.load(nId);
         }
     },
-    updateHeader:function(){
-        this.forceUpdate();
+    updateHeader:function(data){
+        this.setState({ProjectMap:dataMapById(data.result,"id")});
     },
     componentDidMount:function(){
         this.load(this.props.routeParam.id);
-        store.on("projectMap",this.updateHeader);
+        cacheAjax("api/project/list",{},this.updateHeader);
     },
     renderData:function(){
         return this.state.data.map(function(v){
@@ -119,11 +119,10 @@ var Task = React.createClass({
         return <Split className="Task">
             <HelperMenu title="任务"
                         desc="按已完成和未完成的任务分类"
-                        data={this.state.data}
-                        route={this.props.route}>
+                        data={this.state.data}>
                 <div>
                     <div className="helpHeader">所有项目</div>
-                    <ListProjects route={this.props.route}/>
+                    <ListProjects/>
                 </div>
             </HelperMenu>
             <div className="TaskSubContainer">

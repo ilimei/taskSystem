@@ -32,7 +32,7 @@ var HelperMenu = React.createClass({
     },
     renderItem:function(){
         return this.state.data.map(function(v,index){
-            return <Link key={index} activeClass="active" className="listItem" route={this.props.route} to={v.path}>
+            return <Link key={index} activeClass="active" className="listItem" to={v.path}>
                 <i className={v.icon}/><span>{v.text}</span>
             </Link>
         },this);

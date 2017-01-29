@@ -2,7 +2,6 @@
  * React Component UserSet create by ZhangLiwei at 11:57
  */
 var React = require("react");
-var store = require("../../lib/store");
 var Split=require("../../ui/Split");
 var Input=require("../../form/input");
 var FormCheck=require("../../form/formCheck");
@@ -12,6 +11,7 @@ var FileSelectorWrapper=require("../../libui/FileSelectorWrapper");
 var SelHeadIcon=React.createClass({
     getInitialState:function(){
         return {
+            user:this.props.user,
             sel:0,
             onHide:null,
             data:new Array(20).fill(1).map(function(v,index){return index+1;})
@@ -25,12 +25,12 @@ var SelHeadIcon=React.createClass({
     },
     ok:function(){
         if(this.state.sel!=0) {
-            var user=store.get("loginUser");
+            var user=this.state.user;
             Ajax("api/user/update", {
                 "avatar": "/headicon/Fruit-"+this.state.sel+".png"
             }, function (data) {
                 user.avatar="/headicon/Fruit-"+this.state.sel+".png";
-                store.set("loginUser",user);
+                cacheAjaxUpdate("api/project/list",{},user);
                 this.hide();
             },this);
         }
@@ -78,6 +78,7 @@ var SelHeadIcon=React.createClass({
 var UserSet = React.createClass({
     getInitialState:function(){
         return {
+            user:{},
             username:"",
             nick_name:"",
             phone:"",
@@ -90,7 +91,7 @@ var UserSet = React.createClass({
     },
     doSave:function(){
         if(!this.refs["formCheck"].check()){
-            var user=store.get("loginUser");
+            var user=this.state.user;
             if(user.id){
                 var sendObj={};
                 if(this.state.username!=user.name){
@@ -117,7 +118,7 @@ var UserSet = React.createClass({
                                 }else {
                                     user[i] = sendObj[i];
                                 }
-                                store.set("loginUser",user);
+                                cacheAjaxUpdate("api/project/list",{},user);
                             }
                             alert("保存成功");
                         }
@@ -148,40 +149,32 @@ var UserSet = React.createClass({
             return "密码只能是[a-zA-Z0-9_]的组合";
         }
     },
-    onUserChange:function(){
-        var user=store.get("loginUser");
+    onUserChange:function(user){
+        this.state.user=user;
         this.state.username=user.name;
         this.state.nick_name=user.nick_name;
         this.state.phone=user.phone;
         this.state.email=user.email;
-        this.forceUpdate();
+        this.setState({});
     },
     showSelHeadIconModal:function(){
-        showModal(<SelHeadIcon/>);
+        showModal(<SelHeadIcon user={this.state.user}/>);
     },
     componentDidMount:function(){
-        var user=store.get("loginUser");
-        this.state.username=user.name;
-        this.state.nick_name=user.nick_name;
-        this.state.phone=user.phone;
-        this.state.email=user.email;
-        this.unStore=store.on("loginUser",this.onUserChange);
-    },
-    componentWillUnmount:function(){
-        store.un(this.unStore);
+        cacheAjax("api/user/getLoginInfo",{},this.onUserChange);
     },
     render: function () {
-        var user=store.get("loginUser");
+        var {user}=this.state;
         return <Split className="UserSet">
             <div className="Header">
                 <img src={user.avatar} onClick={this.showSelHeadIconModal}/>
             </div>
             <div className="content">
                 <FormCheck ref="formCheck" className="panel">
-                    <Input name="用户名" value={user.name} checks={[this.checkNames]} change={this.handle.bind(this,"username")} noEmpty/>
-                    <Input name="昵称" value={user.nick_name} change={this.handle.bind(this,"nick_name")} noEmpty/>
-                    <Input name="手机" value={user.phone} change={this.handle.bind(this,"phone")} noEmpty/>
-                    <Input name="邮箱" value={user.email} checks={[this.checkEmail]} change={this.handle.bind(this,"email")} noEmpty/>
+                    <Input name="用户名" value={this.state.username} checks={[this.checkNames]} change={this.handle.bind(this,"username")} noEmpty/>
+                    <Input name="昵称" value={this.state.nick_name} change={this.handle.bind(this,"nick_name")} noEmpty/>
+                    <Input name="手机" value={this.state.phone} change={this.handle.bind(this,"phone")} noEmpty/>
+                    <Input name="邮箱" value={this.state.email} checks={[this.checkEmail]} change={this.handle.bind(this,"email")} noEmpty/>
                     <Input name="密码" type="password"  checks={[this.checkpwd]} change={this.handle.bind(this,"password")} holder="请输入修改的密码"/>
                     <Input name="确认密码" type="password" checks={[this.checkCKPassword]}  change={this.handle.bind(this,"password")} holder="请输入修改的密码"/>
                     <button className="btn btn-primary" onClick={this.doSave}>保存</button>

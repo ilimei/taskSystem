@@ -2,7 +2,6 @@ var DropAny=require("./DropAny");
 var TaskUrgency=require("./TaskUrgency");
 var TaskList=require("./Tasklist");
 var React = require("react");
-const store=require("../lib/store");
 var Input=require("../form/input");
 
 /***
@@ -16,35 +15,33 @@ var UserDropSearch = React.createClass({
         return {
             filter:"",
             selUserId:this.props.selUser?this.props.selUser.id:0,
-            loginUser:this.props.selUser||store.get("loginUser"),
+            loginUser:this.props.selUser||{},
             data:[]
         }
     },
     clear:function(){
-        var user=store.get("loginUser");
         this.setState({loginUser:user,selUserId:user.id});
     },
-    onLoginUser:function(){
-        var user=store.get("loginUser");
+    onLoginUser:function(user){
         this.setState({loginUser:user,selUserId:user.id});
+    },
+    onUserList:function({result}){
+        var {selUserId}=this.state;
+        var map=dataMapById(result,"id");
+        this.setState({data:result,loginUser:map[selUserId]});
     },
     filterUser:function(v){
         this.setState({filter:v});
     },
     componentDidMount:function(){
-         this.lsfunc=store.on("loginUser",this.onLoginUser);
-         Ajax("api/project/listUser",{
-             projectId:this.props.projectId
-         },function(data){
-           this.setState({data:data.result});
-         },this);
+        cacheAjax("api/user/getLoginInfo",{},this.onLoginUser);
+        cacheAjax("api/project/listUser",{
+            projectId:this.props.projectId
+        },this.onUserList);
     },
     selUser:function(v){
         callAsFunc(this.props.onSelect,[v]);
         this.setState({loginUser:v,selUserId:v.id});
-    },
-    componentWillUnmount:function(){
-        store.un(this.lsfunc);
     },
     renderUsers:function(){
         var filter=this.state.filter;

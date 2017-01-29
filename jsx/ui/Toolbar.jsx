@@ -5,7 +5,6 @@ var DropIcon=require("./DropIcon");
 var React = require("react");
 var TaskList=require("./Tasklist");
 var LinkFunc=require("../lib/router/LinkFunc");
-const store=require("../lib/store");
 
 var Toolbar = React.createClass({
     getInitialState:function(){
@@ -32,8 +31,7 @@ var Toolbar = React.createClass({
         LinkFunc("/user/tasks/pending");
     },
     componentDidMount:function(){
-        Ajax("api/user/getLoginInfo",{},function(data){
-            store.set("loginUser",data);
+        cacheAjax("api/user/getLoginInfo",{},function (data) {
             this.setState({user:data});
         },this);
     },

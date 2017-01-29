@@ -1,7 +1,6 @@
 var DropAny=require("./DropAny");
 var React = require("react");
 var LinkFunc=require("../lib/router/LinkFunc");
-var store=require("../lib/store");
 /***
  * React Component ProjectDrop create by ZhangLiwei at 11:08
  */
@@ -15,7 +14,8 @@ var ProjectDrop = React.createClass({
         }
     },
     componentDidMount:function(){
-        Ajax("api/user/listProjects",{},function(data) {
+        cacheAjax("api/user/listProjects",{},function(data) {
+
             var map={};
             data.result.forEach(function(v){
                 map[v.id]=v;

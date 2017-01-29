@@ -1,6 +1,5 @@
 var React = require("react");
 var Modal=require("../../form/modal");
-var store=require("../../lib/store");
 var SelUserModal=React.createClass({
     getInitialState:function(){
         return {
@@ -84,6 +83,7 @@ var SelUserModal=React.createClass({
 var Users = React.createClass({
     getInitialState:function(){
         return {
+            ProjectMap:null,
             data:[],
             selList:[]
         }
@@ -110,9 +110,12 @@ var Users = React.createClass({
             this.reload();
         }
     },
+    onProjectMap:function({result}){
+          this.setState({ProjectMap:dataMapById(result,"id")});
+    },
     componentDidMount:function(){
-        this.unFunc=store.on("projectMap",this.onProjectMap);
-         Ajax("api/project/listUser",{
+        cacheAjax("api/user/listProjects",{},this.onProjectMap);
+        Ajax("api/project/listUser",{
              projectId:this.props.projectId
          },function(data){
              this.setState({data:data.result});
@@ -143,9 +146,8 @@ var Users = React.createClass({
         });
     },
     renderData:function(){
-        var ProjectMap=store.get("projectMap");
-        console.dir(ProjectMap);
         var userId=-1;
+        var {ProjectMap}=this.state;
         if(ProjectMap&&ProjectMap[this.props.projectId])
             userId=ProjectMap[this.props.projectId].creator;
         return this.state.data.map(function(v){
@@ -166,12 +168,6 @@ var Users = React.createClass({
                 </div>
             </div>
         },this);
-    },
-    onProjectMap:function () {
-        this.forceUpdate();
-    },
-    componentWillUnmount:function(){
-        store.un(this.unFunc);
     },
     render: function () {
         return <div className="Users pd">

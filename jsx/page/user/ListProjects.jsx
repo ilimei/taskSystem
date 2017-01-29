@@ -1,6 +1,5 @@
 var React = require("react");
 var Link=require("../../lib/router/Link");
-var store=require("../../lib/store");
 /***
  * React Component ListUsers create by ZhangLiwei at 14:20
  */
@@ -32,7 +31,7 @@ var ListProjects = React.createClass({
                 var cls = CS({
                     "icon-ok": v.id == this.state.selUserId
                 });
-                return <Link to={v.id+""} activeClass="active" route={this.props.route}>
+                return <Link to={v.id+""} activeClass="active">
                     <div key={v.id} className="userItem" onClick={this.selUser.bind(this, v)}>
                         <div className="avatar"><img src={v.icon}/></div>
                         <div className="userName">{v.name}</div>

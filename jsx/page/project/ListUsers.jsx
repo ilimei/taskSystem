@@ -22,12 +22,13 @@ var ListUsers = React.createClass({
     componentDidMount:function(){
         this.load();
     },
+    onLoad:function({result}){
+        this.setState({data:result});
+    },
     load(){
-        Ajax("api/project/listUser",{
+        cacheAjax("api/project/listUser",{
             projectId:this.state.projectId
-        },function(data){
-            this.setState({data:data.result});
-        },this);
+        },this.onLoad);
     },
     selUser:function(){
 
@@ -40,7 +41,7 @@ var ListUsers = React.createClass({
                 var cls = CS({
                     "icon-ok": v.id == this.state.selUserId
                 });
-                return <Link key={v.id} to={v.name} activeClass="active" route={this.props.route}>
+                return <Link key={v.id} to={v.name} activeClass="active">
                     <div key={v.id} className="userItem" onClick={this.selUser.bind(this, v)}>
                         <div className="avatar"><img src={v.avatar}/></div>
                         <div className="userName">{v.nick_name}</div>

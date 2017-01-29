@@ -6,7 +6,6 @@ var Split=require("../../ui/Split");
 var MainMenu=require("../../ui/MainMenu");
 var HelperMenu=require("../../ui/HelperMenu");
 var React = require("react");
-var store=require("../../lib/store");
 /***
  * React Component Project create by ZhangLiwei at 15:42
  */
@@ -100,8 +99,7 @@ var Project = React.createClass({
         return <Split className="Project">
             <HelperMenu title="项目"
                         desc="按我创建和参与的项目分类"
-                        data={this.state.data}
-                        route={this.props.route}>
+                        data={this.state.data}>
 
             </HelperMenu>
             <div className="ProjectSubContainer">
