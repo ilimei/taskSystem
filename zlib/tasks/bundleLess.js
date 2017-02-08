@@ -82,7 +82,7 @@ const BundleLess = function () {
 gulp.task("bundleLess", ["bundleJS"], function () {
     console.info("start task bundleLess");
     buildEnv.mkDirsSync(buildEnv.buildPath+"/less/outless");
-    return gulp.src("./js/*.js")
+    return gulp.src(buildEnv.buildPath + "/js/*.js")
         .pipe(BundleLess())
         .pipe(gulp.dest("./out/css"))
         .on("finish", function () {
