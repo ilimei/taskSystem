@@ -19,6 +19,7 @@ const extension_reg=/[^.]+$/;
  * @return {string}
  */
 let makeLessFiles = function (file) {
+    let writePath=file;
     file = buildEnv.getPathByBuildPath(file);
     let arr = cache._data.less[file] || [];
     let lessArray = arr.map(function (v) {
@@ -33,7 +34,7 @@ let makeLessFiles = function (file) {
             return "@import \"" + v + "\";";
         }
     }).join("\r\n");
-    fs.writeFileSync(file, data);
+    fs.writeFileSync(writePath, data);
     return data;
 };
 
