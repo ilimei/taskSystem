@@ -42,7 +42,8 @@ var TaskItem = React.createClass({
             }
         },this);
     },
-    toggleDone:function(){
+    toggleDone:function(canSentToOther){
+        if(canSentToOther)return;
         var {task}=this.props;
         var nDone=0;
         if(task.done==0){
@@ -115,7 +116,6 @@ var TaskItem = React.createClass({
     renderContent:function(){
         var {task}=this.props;
         if(task.showContent){
-            console.dir(task.desc);
             return <div className="task-desc" dangerouslySetInnerHTML={{
                 __html:Marked(task.desc)
             }}/>
@@ -138,20 +138,23 @@ var TaskItem = React.createClass({
             "calendar":true,
             "overdue":task.end_time.getTime()>0&&new Date()>task.end_time&&task.done==0
         });
+        const usr=JSON.parse(localStorage.getItem("user"));
+        const canEdit=(usr.id!=task.creator.id);
+        const canSentToOther=(usr.id!=task.creator.id&&usr.id!=task.executor.id);
         return <div className="TaskItem">
             <div className="info-container">
             <div className="done">
-                <i className={cls} onClick={this.toggleDone}/>
+                <i className={cls} onClick={this.toggleDone.bind(this,canSentToOther)}/>
             </div>
             <div className="center">
                 <div className="urgency">
-                    <TaskUrgencyDrop change={this.changeUrgency} value={task.weight}/>
+                    <TaskUrgencyDrop noDrop={canEdit} change={this.changeUrgency} value={task.weight}/>
                 </div>
                 <div className={nameCls}>
                     {task.name}
                 </div>
                 <div className="detail">
-                    <DropCalendar hasSelect={task.end_time.getTime()!=-1} date={task.end_time} className={CalendarCls} onSelect={this.changeEndTime}/>
+                    <DropCalendar noDrop={canEdit} hasSelect={task.end_time.getTime()!=-1} date={task.end_time} className={CalendarCls} onSelect={this.changeEndTime}/>
                     <span className="creator">
                         创建者：{task.creator.name}
                     </span>
@@ -172,7 +175,7 @@ var TaskItem = React.createClass({
                 </div>
             </div>
             <div className="executor">
-                <UserDropSearch onSelect={this.updateExecutor} projectId={task.project.id} selUser={task.executor} noDrop={task.done!=0}/>
+                <UserDropSearch onSelect={this.updateExecutor} projectId={task.project.id} selUser={task.executor} noDrop={task.done!=0||canSentToOther}/>
             </div>
             <div className="delTask">
                 <i className="icon-minus-sign" onClick={this.delTask}/>
