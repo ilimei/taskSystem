@@ -85,7 +85,7 @@ gulp.task("bundleLess", ["bundleJS"], function () {
     buildEnv.mkDirsSync(buildEnv.buildPath+"/less/outless");
     return gulp.src(buildEnv.buildPath + "/js/*.js")
         .pipe(BundleLess())
-        .pipe(gulp.dest("./out/css"))
+        .pipe(gulp.dest(buildEnv.buildPath + "/out/css"))
         .on("finish", function () {
             if (!buildEnv.plugin && fs.existsSync(buildEnv.PluginJSPath)) {
                 buildEnv.plugin = require(buildEnv.PluginJSPath);
