@@ -4,7 +4,8 @@
   "scripts": {
     "构建项目": "node build.js",
     "清理项目": "node build.js cleanBuild",
-    "发布项目": "node build.js makePub"
+    "发布项目": "node build.js makePub",
+    "测试项目": "node ./serverTest/test.js"
   },
   "browserify-shim": {
     "react": "global:React",
@@ -30,6 +31,7 @@
     "marked": "^0.3.6",
     "multer": "^1.2.1",
     "mysql": "^2.12.0",
+    "nodeunit": "^0.11.0",
     "object-assign": "^4.1.1",
     "react": "15.4.2",
     "react-dom": "^15.4.2",
