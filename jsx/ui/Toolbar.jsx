@@ -11,6 +11,8 @@ var Toolbar = React.createClass({
         return {
             user:{},
             menu:[
+                {"text":"我的任务",icon:"icon-tasks",click:this.myTask},
+                {"text":"修改信息",icon:"icon-edit",click:this.changeInfo},
                 {"text":"退出登录",icon:"icon-cloud-download",click:this.logout},
             ],
             data:[
@@ -18,6 +20,12 @@ var Toolbar = React.createClass({
                 {text:"创建任务",icon:"icon-tasks"}
             ]
         }
+    },
+    myTask:function(){
+        LinkFunc("/user/tasks/all");
+    },
+    changeInfo:function(){
+        LinkFunc("/user/setting");
     },
     logout:function(){
         Ajax("api/user/logout",{},function(data){
@@ -51,7 +59,6 @@ var Toolbar = React.createClass({
 						<TaskList data={this.state.data}/>
 					</DropIcon>
                     <DropIcon className="item right" img={img} dropdown>
-                        {user.name}
                         <TaskList data={this.state.menu}/>
                     </DropIcon>
                 </div>
