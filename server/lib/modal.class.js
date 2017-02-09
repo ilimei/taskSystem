@@ -255,17 +255,24 @@ var Query = MakeClass({
         let prevSql = "create table " + this._modal._tableName + "(";
         let endSql = ") default character set 'utf8'";
         var primaryKey=[];
+        var duplicateKey=this._modal._keySize>1;
         let sqlParamArr = this._modal._rule.reduce(function (prev, curr) {
-            if (curr.key) {
-                primaryKey.push(curr.id)
+            if(duplicateKey) {
+                if (curr.key) {
+                    primaryKey.push("`" + curr.id + "` ")
+                }
+                prev.push("`" + curr.id + "` " + curr.type);
+            }else{
+                if (curr.key) {
+                    prev.push("`" + curr.id + "` " + curr.type +" primary key");
+                }else{
+                    prev.push("`" + curr.id + "` " + curr.type);
+                }
             }
-            prev.push("`" + curr.id + "` " + curr.type);
             return prev;
         }, []);
-        if(primaryKey.length>1){
+        if(duplicateKey){
             sqlParamArr.push(" primary key ("+primaryKey.join(",")+")");
-        }else if(primaryKey.length==1){
-            sqlParamArr.push(" primary key "+primaryKey[0]);
         }
         log(prevSql + sqlParamArr.join(",") + endSql)
         return QueryPromise(prevSql + sqlParamArr.join(",") + endSql,undefined,db).then(function (obj) {
@@ -294,10 +301,12 @@ var Modal = MakeClass({
     _tableName: "test",
     init: function () {
         this._keyMap = {};
+        this._keySize=0;
         var self = this;
         this._ruleMap = this._rule.reduce(function (prev, curr) {
             if (curr.key) {
                 self._keyMap[curr.id] = curr;
+                self._keySize++;
             } else {
                 prev[curr.id] = curr;
             }
