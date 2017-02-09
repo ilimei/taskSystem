@@ -45,13 +45,15 @@ router.post("/listProject", function (req, res) {
         var rows = parseInt(req.body.rows);//每页多少个
         let projectId = req.body.projectId;
         let queryType = req.body.type;
+        let filter=req.body.filter;
         let task = new TaskModal();
         let userId = req.session.userid;
         switch (queryType) {
             case "all": {
                 let query = task.find().where({
-                    project: projectId
-                }).orderBy(["done asc","weight asc","update_time"], true);
+                    project: projectId,
+                    done:filter==-1?null:filter
+                }).orderBy(["done asc","weight desc","update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -61,7 +63,7 @@ router.post("/listProject", function (req, res) {
                 let query = task.find().where({
                     project: projectId,
                     done: 1
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -71,7 +73,7 @@ router.post("/listProject", function (req, res) {
                 let query = task.find().where({
                     project: projectId,
                     done: 0
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -82,7 +84,7 @@ router.post("/listProject", function (req, res) {
                     project: projectId,
                     end_time: ["<", new Date().getTime() + ""],
                     done: 0
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -91,8 +93,9 @@ router.post("/listProject", function (req, res) {
             case "created": {
                 let query = task.find().where({
                     creator: userId,
-                    project: projectId
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                    project: projectId,
+                    done:filter==-1?null:filter
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -101,8 +104,9 @@ router.post("/listProject", function (req, res) {
             default: {
                 let query = task.find().where({
                     project: projectId,
-                    executor: new User().find(["id"]).where({name: queryType})
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                    executor: new User().find(["id"]).where({name: queryType}),
+                    done:filter==-1?null:filter
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -147,7 +151,7 @@ router.post("/listUser", function (req, res) {
             case "all": {
                 let query = task.find().where({
                     executor: userId
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -157,7 +161,7 @@ router.post("/listUser", function (req, res) {
                 let query = task.find().where({
                     executor: userId,
                     done: 1
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -167,7 +171,7 @@ router.post("/listUser", function (req, res) {
                 let query = task.find().where({
                     executor: userId,
                     done: 0
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -178,7 +182,7 @@ router.post("/listUser", function (req, res) {
                     executor: userId,
                     end_time: ["<", new Date().getTime() + ""],
                     done: 0
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -187,7 +191,7 @@ router.post("/listUser", function (req, res) {
             case "created": {
                 let query = task.find().where({
                     creator: userId
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
@@ -197,7 +201,7 @@ router.post("/listUser", function (req, res) {
                 let query = task.find().where({
                     project: queryType,
                     executor: userId
-                }).orderBy(["done asc","weight asc", "update_time"], true);
+                }).orderBy(["done asc","weight desc", "update_time"], true);
                 return yield [
                     query.count(),
                     query.offset((page - 1) * rows).limit(rows).all()
