@@ -27,14 +27,18 @@ var DropCalendar = React.createClass({
     onSelect:function(date){
         this.setState({date:date,hasSelect:true});
         callAsFunc(this.props.onSelect,[date]);
+        this.refs["dropIcon"].hide();
+    },
+    onShow:function(){
+        this.refs["dropPanel"].focus();
     },
     render: function () {
         var {date,hasSelect}=this.state;
         var {className}=this.props;
         var dateText=hasSelect?date.Format("yyyy年MM月dd日"):"无期限";
-        return <DropIcon className={className+" noShadow"} text={dateText} icon="icon-calendar">
+        return <DropIcon onShow={this.onShow} ref="dropIcon" focusDrop noDrop={this.props.noDrop} className={className+" noShadow"} text={dateText} icon="icon-calendar">
             <Calendar date={date} onSelect={this.onSelect}/>
-            <div>
+            <div className="noOutline" tabIndex="-1" ref="dropPanel">
                 <button className="btn btn-link" onClick={this.setDate.bind(this,"today")}>今天</button>
                 <button className="btn btn-link" onClick={this.setDate.bind(this,"tomorrow")}>明天</button>
                 <button className="btn btn-link" onClick={this.setDate.bind(this,"clear")}>清除</button>

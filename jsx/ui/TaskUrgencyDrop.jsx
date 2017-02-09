@@ -31,19 +31,25 @@ var TaskUrgencyDrop = React.createClass({
     },
     renderIcon:function(){
         var v=parseInt(this.state.value);
+        var name=this.getName(v);
         if(this.props.showName){
-            return <span body>
+            return <span body alt={name} title={name}>
                 <TaskUrgency urgency={v}/>
-                {this.getName(v)}
+                {name}
             </span>;
         }else{
-            return  <TaskUrgency urgency={v} body/>
+            return  <TaskUrgency urgency={v} body  alt={name} title={name}/>
         }
     },
+    onShow:function(){
+        this.refs["dropPanel"].focus();
+    },
     render: function () {
-        return <DropAny className="TaskUrgencyDrop">
+        return <DropAny focusDrop onShow={this.onShow} noDrop={this.props.noDrop} className="TaskUrgencyDrop">
             {this.renderIcon()}
-            <TaskList data={this.state.data}/>
+            <div className="noOutline" tabIndex="-1" ref="dropPanel">
+                <TaskList data={this.state.data}/>
+            </div>
         </DropAny>
     }
 });

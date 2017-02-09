@@ -34,7 +34,8 @@ var UserDropSearch = React.createClass({
         this.setState({filter:v});
     },
     componentDidMount:function(){
-        cacheAjax("api/user/getLoginInfo",{},this.onLoginUser);
+        if(!this.props.selUser)
+            cacheAjax("api/user/getLoginInfo",{},this.onLoginUser);
         cacheAjax("api/project/listUser",{
             projectId:this.props.projectId
         },this.onUserList);
@@ -67,16 +68,19 @@ var UserDropSearch = React.createClass({
             {this.renderUsers()}
         </div>
     },
+    onShow:function(){
+        this.refs["dropPanel"].focus();
+    },
     render: function () {
         var {loginUser}=this.state;
-        return <DropAny noDrop={this.props.noDrop} className="UserDropSearch">
-            <div body>
+        return <DropAny onShow={this.onShow} focusDrop noDrop={this.props.noDrop} className="UserDropSearch">
+            <NativeDom np="body" body>
                 <div className="avatar" >
-                    <img src={loginUser.avatar}/>
+                    <img src={loginUser.avatar} alt={loginUser.nick_name} title={loginUser.nick_name}/>
                 </div>
                 {this.props.showName&&loginUser.nick_name}
-            </div>
-            {this.renderDrop()}
+            </NativeDom>
+            <div className="noOutline" tabIndex="-1" ref="dropPanel">{this.renderDrop()}</div>
         </DropAny>
     }
 });

@@ -3,10 +3,10 @@
 **/
 .TaskItem {
 	padding-bottom: 10px;
-	margin: 10px 0;
+	font-size: 14px;
+	border-bottom: 1px solid #eee;
 	&:hover {
 		background: #fff;
-		border-radius: 5px;
 		.info-container .delTask {
 			display: block;
 		}
@@ -14,6 +14,7 @@
 	.info-container {
 		display: flex;
 		position: relative;
+		padding: 8px 0 0 0;
 		.done {
 			width: 40px;
 			text-align: center;
@@ -31,8 +32,9 @@
 				display: inline-block;
 			}
 			.detail {
+				margin-top: 8px;
 				color: #FFA487;
-				font-size: 14px;
+				font-size: 12px;
 				.calendar {
 					display: inline-block;
 					margin: 0 4px;
@@ -42,7 +44,7 @@
 					}
 					&.overdue{
 						color: white;
-						background: red;
+						background: #D04D4D;
 						padding: 0 4px;
 						border-radius: 3px;
 					}

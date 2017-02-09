@@ -22,7 +22,7 @@ var TaskUrgency = React.createClass({
         },this);
     },
     render: function () {
-        return <span className="TaskUrgency">
+        return <span className="TaskUrgency" alt={this.props.alt} title={this.props.title}>
                 {this.renderUrgency()}
         </span>
     }

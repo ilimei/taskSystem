@@ -116,7 +116,7 @@ var TaskItem = React.createClass({
     renderContent:function(){
         var {task}=this.props;
         if(task.showContent){
-            return <div className="task-desc" dangerouslySetInnerHTML={{
+            return <div className="task-desc markdown_css" dangerouslySetInnerHTML={{
                 __html:Marked(task.desc)
             }}/>
         }

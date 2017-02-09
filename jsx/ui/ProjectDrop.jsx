@@ -15,12 +15,10 @@ var ProjectDrop = React.createClass({
     },
     componentDidMount:function(){
         cacheAjax("api/user/listProjects",{},function(data) {
-
             var map={};
             data.result.forEach(function(v){
                 map[v.id]=v;
             });
-            store.set("projectMap",map);
             this.setState({data:data.result,selProject:map[this.state.projectId]});
         },this);
     },
@@ -42,9 +40,9 @@ var ProjectDrop = React.createClass({
     render: function () {
         var {selProject}=this.state;
         return <DropAny className="ProjectDrop">
-            <div body>
+            <NativeDom Name="div" np="body" body>
                 {selProject?selProject.name:""}
-            </div>
+            </NativeDom>
             <div className="">
                 {this.renderProjects()}
             </div>

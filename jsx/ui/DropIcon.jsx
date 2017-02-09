@@ -1,6 +1,9 @@
 var React = require("react");
 
 var DropIcon = React.createClass({
+    propTypes:{
+        onShow:React.PropTypes.func
+    },
     getInitialState:function(){
         return {
             show:false
@@ -43,6 +46,7 @@ var DropIcon = React.createClass({
             setTimeout(function () {
                 clearTimeout(me.timerId);
                 me.setState({show: true});
+                callAsFunc(me.props.onShow);
             }, 51);
         }
     },
