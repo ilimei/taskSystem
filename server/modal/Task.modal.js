@@ -10,7 +10,7 @@ var TaskModal = MakeClass({
         {id: "end_time", type: "varchar(20)"},//结束时间
         {id: "weight", type: "int"},//紧急程度
         {id: "project", type: "int"},//项目id
-        {id: "done", type: "int"},//是否完成
+        {id: "done", type: "int"},//是否完成 0 未完成 1 完成 2 归档 3 关闭
         {id:"update_time",type:"varchar(20)"},//更新时间
         {id: "name", type: "varchar(400)"},//任务名称
         {id: "desc", type: "text"},
