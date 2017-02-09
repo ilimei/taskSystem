@@ -251,7 +251,7 @@ var Query = MakeClass({
             return obj.rows;
         });
     },
-    create: function () {
+    create: function (db,undefined) {
         let prevSql = "create table " + this._modal._tableName + "(";
         let endSql = ") default character set 'utf8'";
         var primaryKey=[];
@@ -268,13 +268,13 @@ var Query = MakeClass({
             sqlParamArr.push(" primary key "+primaryKey[0]);
         }
         log(prevSql + sqlParamArr.join(",") + endSql)
-        return QueryPromise(prevSql + sqlParamArr.join(",") + endSql).then(function (obj) {
+        return QueryPromise(prevSql + sqlParamArr.join(",") + endSql,undefined,db).then(function (obj) {
             return obj.rows;
         });
     },
-    drop: function () {
+    drop: function (db,undefined) {
         let sql = "drop table if exists " + this._modal._tableName;
-        return QueryPromise(sql).then(function (obj) {
+        return QueryPromise(sql,undefined,db).then(function (obj) {
             return obj.rows;
         });
     },
@@ -304,11 +304,11 @@ var Modal = MakeClass({
             return prev;
         }, {});
     },
-    create: function () {
-        return new Query(this).create();
+    create: function (db) {
+        return new Query(this).create(db);
     },
-    drop: function () {
-        return new Query(this).drop();
+    drop: function (db) {
+        return new Query(this).drop(db);
     },
     find: function (arr,db) {
         var q = new Query(this,db);
