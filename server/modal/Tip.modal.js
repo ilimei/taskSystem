@@ -1,7 +1,6 @@
 'use strict'
 var MakeClass=require("../lib/class");
 var ModalClass=require("../lib/modal.class.js");
-var Project=require("./Project.modal.js");
 
 // 标签类
 var TipModal=MakeClass({
@@ -14,12 +13,8 @@ var TipModal=MakeClass({
 	_tableName:"m_tip",
 	init:function(){
 		this.callSuper("init",arguments);
-	},
-	getProject:function(){
-		if(this.project_id)
-			return new Project().find().where({id:this.project_id}).one();
 	}
-},ModalClass,TipModal);
+},ModalClass,"TipModal");
 
 // var co=require("co");
 // co(function*(){
