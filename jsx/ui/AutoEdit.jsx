@@ -24,6 +24,9 @@ Marked.setOptions({
 });
 
 var AutoEdit = React.createClass({
+    propTypes:{
+        cantEdit:React.PropTypes.bool
+    },
     getInitialState:function(){
         return {
             value:this.props.value||"",
@@ -110,6 +113,7 @@ var AutoEdit = React.createClass({
         this.forceUpdate();
     },
     preview:function(){
+        if(this.props.cantEdit)return;
         this.setState({preview:!this.state.preview});
     },
     shouldHide:function(e){
@@ -151,7 +155,7 @@ var AutoEdit = React.createClass({
                           onPaste={this.onKeyDown}
                           style={tStyle}
                           ref="editor"/>
-                <div className="prev" dangerouslySetInnerHTML={this.state.html} style={sStyle} ref="preview"></div>
+                <div className="prev markdown_css" dangerouslySetInnerHTML={this.state.html} style={sStyle} ref="preview"></div>
             </div>
             <div className="toolbar">
                 <i className="icon-code" onMouseDown={this.stopPrevent} onClick={this.insertCode}/>
