@@ -16,3 +16,5 @@ var TipTask=MakeClass({
         this.callSuper("init",arguments);
     }
 },ModalClass,"TipTask");
+
+module.exports=TipTask;
