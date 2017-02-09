@@ -14,13 +14,14 @@ if (!global.App) {
 }
 var Modal=require("./modal.class");
 
-function QueryPromise(sql, param) {
+function QueryPromise(sql, param,db) {
+    let executor=db||pool;
     return new Promise(function (resolve, reject) {
         let logIndex = 0;
         log("execute sql " + sql.replace(/\?/g, function (matchStr, index) {
                 return param[logIndex++];
             }));
-        pool.query(sql, param, function (err, rows, fields) {
+        executor.query(sql, param, function (err, rows, fields) {
             if (err) {
                 reject(err);
             }
@@ -37,11 +38,12 @@ var QueryMode = {
     UNSET: Symbol("unset")
 };
 class Query {
-    constructor() {
+    constructor(db) {
         this._table = null;
         this._mode = QueryMode.UNSET;
         this._param = [];//参数列表
         this._filter = [];//查询筛选
+        this._db=db;
     }
 
     _setTable(table){
@@ -238,8 +240,8 @@ class Query {
         }
     }
 
-    exec() {
-        return QueryPromise(this.sql(), this._param);
+    exec(db) {
+        return QueryPromise(this.sql(), this._param,db||this._db);
     }
 
     toString() {

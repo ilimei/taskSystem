@@ -19,14 +19,15 @@ if (!global.App) {
     pool = App.dbPool;
 }
 
-function QueryPromise(sql, param) {
+function QueryPromise(sql, param,db) {
+    let executor=db||pool;
     if (param != undefined) {
         return new Promise(function (resolve, reject) {
             let logIndex=0;
             log("execute sql "+sql.replace(/\?/g,function(matchStr,index){
                     return param[logIndex++];
                 }));
-            pool.query(sql, param, function (err, rows, fields) {
+            executor.query(sql, param, function (err, rows, fields) {
                 if (err) {
                     reject(err);
                 }
@@ -35,7 +36,7 @@ function QueryPromise(sql, param) {
         });
     } else {
         return new Promise(function (resolve, reject) {
-            pool.query(sql, function (err, rows, fields) {
+            executor.query(sql, function (err, rows, fields) {
                 if (err) {
                     reject(err);
                 }
@@ -46,7 +47,7 @@ function QueryPromise(sql, param) {
 }
 
 var Query = MakeClass({
-    init: function (modal) {
+    init: function (modal,db) {
         this._modal = modal;
         this._firstQuery = false;
         this._query = [];
@@ -54,6 +55,7 @@ var Query = MakeClass({
         this._param = [];
         this._offset = null;
         this._limit = null;
+        this._db=db;
     },
     find: function (arr) {
         if(typeof arr=="string"){
@@ -79,13 +81,14 @@ var Query = MakeClass({
         for (var id in map) {
             if (map.hasOwnProperty(id)) {
                 var value = map[id];
+                if(value===null)continue;
                 if (Array.isArray(value)) {
                     this._addQueryFilter(arr,id,value[0],value[1]);
                     continue;
                 }else if(typeof value=="object"){
                     this._addQueryFilter(arr,id,"in",value);
                     continue;
-                } else {
+                } else{
                     this._addQueryFilter(arr,id,"=",value);
                     continue;
                 }
@@ -116,7 +119,7 @@ var Query = MakeClass({
     one: function (bool) {
         var self = this;
         var sql = this.sql();
-        return QueryPromise(sql, this._param).then(function (obj) {
+        return QueryPromise(sql, this._param,this._db).then(function (obj) {
             if(bool){
                 return obj.rows[0];
             }
@@ -130,7 +133,7 @@ var Query = MakeClass({
         });
     },
     all: function (callback) {
-        return QueryPromise(this.sql(), this._param).then(function (obj) {
+        return QueryPromise(this.sql(), this._param,this._db).then(function (obj) {
             return obj.rows;
         });
     },
@@ -138,7 +141,7 @@ var Query = MakeClass({
         var self = this;
         var sql = this.sql();
         sql = "select count(*) c from (" + sql + ") a";
-        return QueryPromise(sql, this._param).then(function (obj) {
+        return QueryPromise(sql, this._param,this._db).then(function (obj) {
             if (obj.rows[0]) {
                 return parseInt(obj.rows[0]["c"]);
             }
@@ -179,7 +182,7 @@ var Query = MakeClass({
         }
         return prevSql;
     },
-    update: function (callback) {
+    update: function (db) {
         if (!this._modal._keyMap) {
             throw new Error("this table " + this._modal._tableName + " has no primary key");
         }
@@ -203,11 +206,11 @@ var Query = MakeClass({
         if (arr.length) {
             sql += arr.join(",") + " where " + whereSql.join(" and ");
         }
-        return QueryPromise(sql, _param).then(function (obj) {
+        return QueryPromise(sql, _param,db).then(function (obj) {
             return obj.rows;
         });
     },
-    insert: function (callback) {
+    insert: function (db) {
         var _param = [];
         var arr = [];
         var sql = "insert into " + this._modal._tableName + "(";
@@ -227,11 +230,11 @@ var Query = MakeClass({
             }
         }
         sql += keys.join(",") + ") values(" + arr.join(",") + ")";
-        return QueryPromise(sql, _param).then(function (obj) {
+        return QueryPromise(sql, _param,db).then(function (obj) {
             return obj.rows;
         });
     },
-    delete: function () {
+    delete: function (db) {
         if (!this._modal._keyMap) {
             throw new Error("this table " + this._modal._tableName + " has no primary key");
         }
@@ -244,7 +247,7 @@ var Query = MakeClass({
             whereSql.push("`" + i + "`=?");
         }
         var sql = "delete from " + this._modal._tableName + " where " + whereSql.join(" and ");
-        return QueryPromise(sql, this._param).then(function (obj) {
+        return QueryPromise(sql, this._param,db).then(function (obj) {
             return obj.rows;
         });
     },
@@ -307,18 +310,18 @@ var Modal = MakeClass({
     drop: function () {
         return new Query(this).drop();
     },
-    find: function (arr) {
-        var q = new Query(this);
+    find: function (arr,db) {
+        var q = new Query(this,db);
         return q.find(arr);
     },
-    update: function (callback) {
-        return new Query(this).update(callback);
+    update: function (db) {
+        return new Query(this).update(db);
     },
-    delete: function (callback) {
-        return new Query(this).delete(callback);
+    delete: function (db) {
+        return new Query(this).delete(db);
     },
-    insert: function (callback) {
-        return new Query(this).insert(callback);
+    insert: function (db) {
+        return new Query(this).insert(db);
     }
 }, null, "Modal");
 
