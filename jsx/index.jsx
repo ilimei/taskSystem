@@ -9,50 +9,30 @@ var Router = require("./lib/router/Router");
 var Route = require("./lib/router/Route");
 var RedirectRoute = require("./lib/router/RedirectRoute");
 
-var Base = React.createClass({
-    render: function () {
-        return <div className="Base">
-            {this.props.children}
-        </div>
+function NativeDom(props){
+    const {Name="div",...rest}=props;
+    if(rest.np) {
+        var nprop={};
+        if(Array.isArray(rest.np)){
+            for(var i in rest){
+                if(i!='np'&&!rest.np.indexOf(i)){
+                    nprop[i]=rest[i];
+                }
+            }
+        }else{
+            for(var i in rest){
+                if(i!='np'&&i!=rest.np){
+                    nprop[i]=rest[i];
+                }
+            }
+        }
+        return React.createElement(Name,nprop,props.children);
+    }else{
+        return React.createElement(Name,rest,props.children);
     }
-});
+}
 
-var Div = React.createClass({
-    render: function () {
-        return <div className="Div">
-            {this.props.children}
-        </div>
-    }
-});
-
-window.Div = Div;
-
-var Test = React.createClass({
-    componentDidUpdate: function () {
-        console.info("componentDidUpdate " + this.props.name);
-    },
-    componentDidMount: function () {
-        console.info("componentDidMount " + this.props.name);
-    },
-    componentWillMount: function () {
-        console.info("componentWillMount " + this.props.name);
-    },
-    render: function () {
-        console.info("render " + this.props.name);
-        return <div className="Test">
-            {this.props.children}
-        </div>
-    }
-});
-
-var TestContainer = React.createClass({
-    render: function () {
-        return <Test name="root">
-            <Test name="leaf1"/>
-            <Test name="leaf2"/>
-        </Test>
-    }
-});
+window.NativeDom = NativeDom;
 
 window.onload = function () {
     ReactDOM.render(<Main/>, document.body)
