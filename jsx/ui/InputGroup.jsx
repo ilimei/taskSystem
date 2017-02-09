@@ -22,13 +22,16 @@ var InputGroup = React.createClass({
         this.refs["dropAny"].hide();
     },
     renderCenter:function(re,props){
+        var nprop=Object.assign({},props);
+        nprop.np="body";
+        nprop.Name="input";
         if(re.dropper){
             return <DropAny className="groupCenter" focusDrop ref="dropAny">
-                <input {...props} onChange={this.handle} onBlur={this.hideDrop} value={this.state.value} body/>
+                <NativeDom {...nprop} onChange={this.handle} onBlur={this.hideDrop} value={this.state.value} body/>
                 {re.dropper[0]}
             </DropAny>
         }else{
-            return  <input {...props} onChange={this.handle} className="groupCenter" value={this.state.value}/>
+            return  <NativeDom {...nprop} onChange={this.handle} className="groupCenter" value={this.state.value}/>
         }
     },
     render: function () {
