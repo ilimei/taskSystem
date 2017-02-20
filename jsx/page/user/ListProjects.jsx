@@ -11,12 +11,11 @@ var ListProjects = React.createClass({
         }
     },
     componentDidMount:function(){
-        Ajax("api/user/listProjects",{},function(data){
+        cacheAjax("api/user/listProjects",{},function(data){
             var map={};
             data.result.forEach(function(v){
                 map[v.id]=v;
             });
-            store.set("projectMap",map);
             this.setState({data:data.result});
         },this);
     },
