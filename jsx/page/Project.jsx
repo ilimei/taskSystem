@@ -19,7 +19,8 @@ var Project = React.createClass({
             ProjectMap:false,
             data:[
                 {text:"任务",icon:"icon-tasks",path:"tasks",component:Task},
-                {text:"需求",icon:"icon-tasks",path:"docs",component:Docs},
+                {text:"需求",icon:"icon-book",path:"docs",component:Docs,title:"需求文档",treeId:-1,helperText:"项目的所有需求"},
+                {text:"技术",icon:"icon-book",path:"skillDocs",component:Docs,title:"技术文档",treeId:-2,helperText:"项目的所有技术文档"},
                 {text:"成员",icon:"icon-user",path:"users",component:Users}
             ]
         }
@@ -27,7 +28,8 @@ var Project = React.createClass({
     renderRoute:function(){
         var projectId=this.props.routeParam.id;
         return this.state.data.map(function(v,index){
-            return <Route key={v.path} path={v.path} component={v.component} projectId={projectId}/>
+            let {text,icon,...props}=v;
+            return <Route key={v.path} {...props} projectId={projectId}/>
         },this);
     },
     onProjectMap:function(map){
