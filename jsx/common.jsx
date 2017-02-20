@@ -4,6 +4,9 @@
  */
 var React=require("react");
 var ReactDOM=require("react-dom");
+require("./ue/UEditor");
+var CodeMirror=require("./codeMirror/codemirror");
+window.CodeMirror=CodeMirror;
 
 window.React=React;
 window.ReactDOM=ReactDOM;
