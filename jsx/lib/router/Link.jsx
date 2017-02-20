@@ -3,7 +3,9 @@ var React = require("react");
 var RouterLib=require("./RouteFuncLib");
 var {matchPath,log}=RouterLib;
 var title="";
-var state={};
+var cache={
+    state:{}
+}
 
 var Link=React.createClass({
     propTypes: {
@@ -19,21 +21,17 @@ var Link=React.createClass({
         return RouterLib.shouldUpdate;
     },
     jumpTo:function(){
-        history.pushState(state, title,"/"+this.context._matchPath+"/"+this.props.to);
+        history.pushState(cache.state, title,"/"+this.context._matchPath+"/"+this.props.to);
         EventSpider.trigger("urlChange");
     },
     render:function(){
         RouterLib.DEBUG=this.props.DEBUG;
-        var cls=null;
         var {activeClass,to,className,DEBUG,...props}=this.props;
+        var obj={};
         if(activeClass){
-            var obj={};
             obj[activeClass]=matchPath(to,this.context._routeUnMatchPath,{});
-            cls=CS(obj);
         }
-        if(className){
-            cls+=" "+className;
-        }
+        var cls=CS(obj,className);
         return <a {...props} onClick={this.jumpTo} className={cls}>{this.props.children}</a>
     }
 });
