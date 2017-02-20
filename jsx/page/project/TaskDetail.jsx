@@ -5,6 +5,7 @@ var UserDropSearch=require("../../ui/UserDropSearch");
 var TaskUrgencyDrop=require("../../ui/TaskUrgencyDrop");
 var DropIcon=require("../../ui/DropIcon");
 var DropCalendar=require("../../ui/DropCalendar");
+var DropTipList=require("../../ui/tip/DropTipList");
 /***
  * React Component TaskDetail create by ZhangLiwei at 12:47
  */
@@ -71,7 +72,8 @@ var TaskDetail = React.createClass({
             }
         },this);
     },
-    toggleDone:function(){
+    toggleDone:function(canSentToOther){
+        if(canSentToOther)return;
         var {task}=this.state;
         var nDone=0;
         if(task.done==0){
@@ -125,6 +127,19 @@ var TaskDetail = React.createClass({
     renderLoader(){
         return <div><i className="icon-spin icon-spinner"/>数据加载中..</div>
     },
+    renderTips(){
+        var {task}=this.state;
+        if(!task||!task.tips)return;
+        var tips=task.tips;
+        return tips.map(function (v) {
+            return <span className="tip" style={{background:v.color}}>{v.name}</span>
+        },this);
+    },
+    onSelectTips:function(tips){
+        var {task}=this.state;
+        task.tips=tips;
+        this.forceUpdate();
+    },
     render: function () {
         var {task,project}=this.state;
         if(task==null||project==null){
@@ -137,13 +152,17 @@ var TaskDetail = React.createClass({
             "icon-check-empty":task.done==0,
             "icon-check":task.done!=0
         });
+        const usr=JSON.parse(localStorage.getItem("user"));
+        const canEdit=(usr.id!=task.creator.id);
+        const canSentToOther=(usr.id!=task.creator.id&&usr.id!=task.executor.id);
+
         return <Split className="TaskDetail" vertical>
             <div className="taskTitle">
                 <div className="done">
-                    <i className={cls} onClick={this.toggleDone}/>
+                    <i className={cls} onClick={this.toggleDone.bind(this,canSentToOther)}/>
                 </div>
                 <span className="title">
-                    <textarea value={this.state.name} onKeyDown={this.saveName} onBlur={this.saveName} onChange={this.handle.bind(this,"name")}/>
+                    <textarea disabled={canEdit} value={this.state.name} onKeyDown={this.saveName} onBlur={this.saveName} onChange={this.handle.bind(this,"name")}/>
                 </span>
             </div>
             <Split>
@@ -152,7 +171,7 @@ var TaskDetail = React.createClass({
                         <i className="icon-align-right"/>
                     </div>
                     <div className="center">
-                        <AutoEdit preview
+                        <AutoEdit cantEdit={canEdit} preview
                                   change={this.handleContent.bind(this,"content")}
                                   value={task.desc} noLimitHeight>
                             <i className="icon-save" onClick={this.changeDesc}/>
@@ -169,15 +188,22 @@ var TaskDetail = React.createClass({
                     </div>
                     <div className="title">执行者</div>
                     <div className="container">
-                        <UserDropSearch onSelect={this.updateExecutor} showName projectId={this.props.projectId} selUser={task.executor} noDrop={task.done!=0}/>
+                        <UserDropSearch onSelect={this.updateExecutor} showName projectId={this.props.projectId} selUser={task.executor} noDrop={task.done!=0||canSentToOther}/>
                     </div>
                     <div className="title">紧急程度</div>
                     <div className="container">
-                        <TaskUrgencyDrop change={this.changeUrgency} value={task.weight} showName/>
+                        <TaskUrgencyDrop noDrop={canEdit} change={this.changeUrgency} value={task.weight} showName/>
                     </div>
                     <div className="title">截止日期</div>
                     <div className="container">
-                        <DropCalendar hasSelect={task.end_time.getTime()!=-1} className="calendar" icon="icon-calendar" date={task.end_time} onSelect={this.changeEndTime}/>
+                        <DropCalendar  noDrop={canEdit} hasSelect={task.end_time.getTime()!=-1} className="calendar" icon="icon-calendar" date={task.end_time} onSelect={this.changeEndTime}/>
+                    </div>
+                    <div className="title">
+                        标签<span className="m-r"/>
+                        <DropTipList selList={dataPropArr(task.tips,"id")} onSelect={this.onSelectTips} projectId={task.project.id} taskId={task.id}/>
+                    </div>
+                    <div className="container">
+                        {this.renderTips()}
                     </div>
                 </div>
             </Split>
