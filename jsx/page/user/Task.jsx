@@ -5,7 +5,6 @@ var LinkFunc=require("../../lib/router/LinkFunc");
 var Split=require("../../ui/Split");
 var MainMenu=require("../../ui/MainMenu");
 var HelperMenu=require("../../ui/HelperMenu");
-var React = require("react");
 var TaskUrgency=require("../../ui/TaskUrgency");
 var InputGroup=require("../../ui/InputGroup");
 var TaskUrgencyDrop=require("../../ui/TaskUrgencyDrop");
@@ -13,6 +12,7 @@ var ListProjects=require("./ListProjects");
 var TaskItem=require("../../ui/TaskItem");
 var PageNation=require("../../libui/PageNation");
 var TaskDetail=require("../project/TaskDetail");
+var React = require("react");
 
 var Tasks=React.createClass({
     getInitialState:function(){
@@ -20,12 +20,16 @@ var Tasks=React.createClass({
             ProjectMap:{},
             data:[],
             page:1,
-            rows:5,
+            rows:10,
             total:0
         }
     },
     getName:function(){
-        var id=this.props.routeParam.id;
+        var {type,id}=this.props.routeParam;
+        if(!id){
+            id=type;
+            type=false;
+        }
         var {ProjectMap}=this.state;
         switch (id){
             case "done": return "已完成的";
@@ -49,7 +53,11 @@ var Tasks=React.createClass({
         </div>
     },
     changePage:function(page){
-        var id=this.props.routeParam.id;
+        var {type,id}=this.props.routeParam;
+        if(!id){
+            id=type;
+            type=false;
+        }
         this.state.page=page;
         this.load(id);
     },
