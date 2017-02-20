@@ -1,0 +1,49 @@
+/***
+ * TipTree class create by ZhangLiwei at 17:05
+**/
+.TipTree {
+	color: #333;
+	font-size: 16px;
+	.head{
+		padding:4px 20px;
+		position: relative;
+		cursor:pointer;
+		.icon{
+			margin-right:12px;
+		}
+		.add{
+			position: absolute;
+			right:20px;
+			top:4px;
+		}
+	}
+	.tip{
+		padding:4px 20px 4px 24px;
+		display:block;
+		font-size: 14px;
+		color:#333;
+		text-decoration: none;
+		cursor: pointer;
+		position: relative;
+		&:hover{
+			background:#f0f0f0;
+			.editArea{
+				display: block;
+			}
+		}
+		&.active{
+			background:rgba(0,0,0,0.08)
+		}
+		i{
+			margin-right:4px;
+		}
+		.editArea{
+			display: none;
+			position: absolute;
+			right:2rem;
+			top:0;
+			line-height: 30px;
+			color:#999;
+		}
+	}
+}

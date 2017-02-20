@@ -1,0 +1,54 @@
+/***
+ * TipAdd class create by ZhangLiwei at 22:03
+**/
+.TipAdd {
+	padding: 10px 4px;
+	background: #fff;
+	border-radius: .3125rem;
+	.wrapper {
+		position: relative;
+		padding-right: 30px;
+		input {
+			width: 100%;
+			box-sizing: border-box;
+			font-size: 12px;
+			padding: 5px 12px;
+			border: 1px solid rgba(0,0,0,.15);
+			outline: 0;
+			color: rgba(0,0,0,.7);
+			border-radius: .3125rem;
+		}
+		.okBtn{
+			position: absolute;
+			margin-left: -10px;
+		}
+		.colorBlock {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 28px;
+			height: 28px;
+			display: inline-block;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			border-radius: 3px;
+			cursor: pointer;
+			vertical-align: top;
+		}
+	}
+	.colorSelector{
+		margin-top:4px;
+		&:after{
+			content:"";
+			display: block;
+			clear: both;
+		}
+		.colors{
+			display:inline-block;
+			width:24px;
+			height:24px;
+			float: left;
+			cursor: pointer;
+		}
+	}
+}

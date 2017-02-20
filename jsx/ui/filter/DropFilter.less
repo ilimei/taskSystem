@@ -1,0 +1,21 @@
+/***
+ * DropFilter class create by ZhangLiwei at 9:03
+**/
+.DropFilter {
+	font-size: 16px;
+	.filterGroup{
+		position: relative;
+		z-index:2;
+		width:150px;
+		text-align: center;
+		.item{
+			cursor:pointer;
+			&.active{
+				background: rgba(0,0,0,.1);
+			}
+			&:hover{
+				background: rgba(0,0,0,.05);
+			}
+		}
+	}
+}
