@@ -6,6 +6,7 @@ var Marked=require("marked");
 var hljs = require('../marked/highlight');
 var LinkFunc=require("../lib/router/LinkFunc");
 var DropCalendar=require("./DropCalendar");
+var DropTipList=require("./tip/DropTipList");
 
 Marked.setOptions({
     renderer: new Marked.Renderer({
@@ -113,6 +114,18 @@ var TaskItem = React.createClass({
             },me);
         });
     },
+    onSelectTips:function(tips){
+        var {task}=this.props;
+        task.tips=tips;
+        this.forceUpdate();
+    },
+    renderTips:function(){
+        var {task}=this.props;
+        var tips=task.tips;
+        return tips.map(function (v) {
+            return <span className="tip" style={{background:v.color}}>{v.name}</span>
+        },this);
+    },
     renderContent:function(){
         var {task}=this.props;
         if(task.showContent){
@@ -156,7 +169,7 @@ var TaskItem = React.createClass({
                 <div className="detail">
                     <DropCalendar noDrop={canEdit} hasSelect={task.end_time.getTime()!=-1} date={task.end_time} className={CalendarCls} onSelect={this.changeEndTime}/>
                     <span className="creator">
-                        创建者：{task.creator.name}
+                        创建者：{task.creator.nick_name}
                     </span>
                     <span className="creator">
                         项目：{task.project.name}
@@ -170,8 +183,10 @@ var TaskItem = React.createClass({
                         {"查看详情"}
                     </span>
                     <span className="tag">
-                        <i className="icon-tags"/>标签
+                        <i className="icon-tags"/>标签：
+                        <DropTipList selList={dataPropArr(task.tips,"id")} onSelect={this.onSelectTips} projectId={task.project.id} taskId={task.id}/>
                     </span>
+                    {this.renderTips()}
                 </div>
             </div>
             <div className="executor">
