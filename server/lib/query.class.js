@@ -43,6 +43,8 @@ class Query {
         this._mode = QueryMode.UNSET;
         this._param = [];//参数列表
         this._filter = [];//查询筛选
+        this._mulplite=0;//多条插入
+        this._insertSelect=false;//insert select 语句
         this._db=db;
     }
 
@@ -86,15 +88,40 @@ class Query {
         return this;
     }
 
-    value(map) {
+    value(map,insertFields) {
         if (this._mode != QueryMode.INSERT) {
             throw new Error("must call new Query().insert(tableName).value(map)");
         }
+        if(map instanceof Query){
+            this._insertSelect=true;
+            this._insertFields=insertFields;
+            this._insertSub=map;
+            this._param=this._param.concat(map._param);
+        }else {
+            this._insertFields = [];
+            for (var i in map) {
+                this._insertFields.push("`" + i + "`");
+                this._param.push(map[i]);
+            }
+        }
+        return this;
+    }
+
+    values(arr){
+        if (this._mode != QueryMode.INSERT) {
+            throw new Error("must call new Query().insert(tableName).values(arr)");
+        }
+        this._mulplite=arr.length;
         this._insertFields = [];
+        var map=arr[0];
         for (var i in map) {
             this._insertFields.push("`" + i + "`");
-            this._param.push(map[i]);
         }
+        arr.forEach(function(map){
+            this._insertFields.forEach(function(key){
+                this._param.push(map[key]);
+            });
+        },this);
         return this;
     }
 
@@ -136,7 +163,7 @@ class Query {
             arr.push(id + " " + op + " (" + value.toString() + ")");
         } else if(Array.isArray(value)){
             this._param=this._param.concat(value);
-            arr.push(id+" "+op+" ("+value.map(()=>"?")+")");
+            arr.push(id+" "+op+" ("+value.map(()=>"?").join(",")+")");
         } else {
             this._param.push(value);
             arr.push(id + " " + op + " ?");
@@ -218,11 +245,20 @@ class Query {
     }
 
     _InsertSql() {
-        var _prevSql = "insert into " + this._table + "(" + this._insertFields.join(",") + ") values(";
-        var _valueSql = this._insertFields.map(function () {
-                return "?"
-            }).join(",") + ")";
-        return _prevSql + _valueSql;
+        if(this._insertSelect){
+            var _prevSql = "insert into " + this._table + "(" + this._insertFields.join(",") + ")"+this._insertSub.sql();
+            return _prevSql;
+        }else {
+            var _prevSql = "insert into " + this._table + "(" + this._insertFields.join(",") + ") values";
+            var _valueSql = "(" + this._insertFields.map(function () {
+                    return "?"
+                }).join(",") + ")";
+            if (this._mulplite > 1) {
+                return _prevSql + _valueSql.repeat(this._mulplite);
+            } else {
+                return _prevSql + _valueSql;
+            }
+        }
     }
 
     sql() {
