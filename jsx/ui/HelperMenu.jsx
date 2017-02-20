@@ -4,11 +4,13 @@
 var React = require("react");
 var Link=require("../lib/router/Link");
 var _InternalPropTypes=require("../lib/router/InternalPropTypes");
+var ResizeBox=require("../libui/ResizeBox");
 
 var HelperMenu = React.createClass({
     propTypes:{
         title:_InternalPropTypes.string,
-        desc:_InternalPropTypes.string
+        desc:_InternalPropTypes.string,
+        noData:_InternalPropTypes.boolean
     },
     getInitialState:function(){
         return {
@@ -31,6 +33,7 @@ var HelperMenu = React.createClass({
         }
     },
     renderItem:function(){
+        if(this.props.noData)return;
         return this.state.data.map(function(v,index){
             return <Link key={index} activeClass="active" className="listItem" to={v.path}>
                 <i className={v.icon}/><span>{v.text}</span>
@@ -39,17 +42,29 @@ var HelperMenu = React.createClass({
     },
     renderChildren:function(){
         return React.Children.map(this.props.children,function(v,index){
-            return <div className="lineTop">
-                {v}
-            </div>
-        });
+            if(index==0&&this.props.noData){
+                return v;
+            }else {
+                return <div className="lineTop">
+                    {v}
+                </div>
+            }
+        },this);
     },
     render: function () {
-        return <div className="HelperMenu">
-            {this.renderHeader()}
-            {this.renderItem()}
-            {this.renderChildren()}
-        </div>
+        if(this.props.resize){
+            return <ResizeBox width={250} className="HelperMenu">
+                {this.renderHeader()}
+                {this.renderItem()}
+                {this.renderChildren()}
+            </ResizeBox>
+        }else{
+            return <div style={{width:250}} className="HelperMenu">
+                {this.renderHeader()}
+                {this.renderItem()}
+                {this.renderChildren()}
+            </div>
+        }
     }
 });
 
