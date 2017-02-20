@@ -71,11 +71,11 @@ var DropIcon = React.createClass({
             "hide":this.props.noDrop
         });
         var style={};
-        if(focusDrop&&this.state.show){
+        if(focusDrop&&this.state.show&&!this.props.noDrop){
             style.display="block";
         }
         return (
-            <div className={cls} onMouseDown={this.onHover}>
+            <div className={cls} onMouseDown={this.onHover} onClick={this.props.onClick}>
                 {this.renderIcon()}
                 <div className={dCls} style={style} onBlur={this.hide} onMouseDown={this.onMouseDown} ref="panel">
                     {this.renderChild()}
