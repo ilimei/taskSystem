@@ -33,3 +33,5 @@ node build.js
 ```
 * 打开chrome浏览器访问`http://localhost:8808/api/install`，安装数据库
 * 打开`http://localhost:8808/`,开始使用
+### 最新修改
+* 增加了项目中的文档和标签
