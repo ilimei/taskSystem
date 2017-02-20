@@ -36,6 +36,7 @@ function QueryPromise(sql, param,db) {
         });
     } else {
         return new Promise(function (resolve, reject) {
+            log("execute sql "+sql);
             executor.query(sql, function (err, rows, fields) {
                 if (err) {
                     reject(err);
@@ -274,7 +275,6 @@ var Query = MakeClass({
         if(duplicateKey){
             sqlParamArr.push(" primary key ("+primaryKey.join(",")+")");
         }
-        log(prevSql + sqlParamArr.join(",") + endSql)
         return QueryPromise(prevSql + sqlParamArr.join(",") + endSql,undefined,db).then(function (obj) {
             return obj.rows;
         });
