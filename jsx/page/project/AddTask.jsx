@@ -67,9 +67,9 @@ var AddTask = React.createClass({
                 <InputGroup ref="inputGroup" placeholder="添加一个任务" change={this.handle.bind(this,"title")}>
                     <TaskUrgencyDrop change={this.handle.bind(this,"urgency")} value={this.state.urgency}/>
                     <AutoEdit ref="autoEdit" placeholder="添加任务描述支持markdown" change={this.handle.bind(this,"content")} dropper/>
-                    <div className="clickAble" foot onClick={this.ok}>
+                    <NativeDom np="foot" className="clickAble" foot onClick={this.ok}>
                         <i className="icon-arrow-right"/>
-                    </div>
+                    </NativeDom>
                 </InputGroup>
             </div>
             <UserDropSearch ref="userDrop" onSelect={this.selUser} projectId={this.props.projectId} foot/>
