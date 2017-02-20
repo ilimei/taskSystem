@@ -39,7 +39,6 @@ var Projects=React.createClass({
                  data.result.forEach(function (v) {
                      map[v.id] = v;
                  });
-                 store.set("projectMap", map);
              }
             this.setState({data:data.result});
          },this);
