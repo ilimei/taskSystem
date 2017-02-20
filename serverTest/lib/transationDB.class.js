@@ -4,18 +4,7 @@
 const DB=require("../../server/lib/transactionDB.class.js");
 const co=require("co");
 const Query=require("../../server/lib/query.class.js");
-
-function getTestPool(){
-    var mysql = require('mysql');
-    pool = mysql.createPool({
-        connectionLimit: 10,
-        host: 'localhost',
-        user: 'root',
-        password: 'root',
-        database: 'coding'
-    });
-    return pool;
-}
+const {getTestPool}=require("../config");
 
 module.exports={
     "test transaction":function(test){
