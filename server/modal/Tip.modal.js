@@ -8,7 +8,7 @@ var TipModal=MakeClass({
 		{id:"id",type:"int auto_increment",key:true},
 		{id:"project_id",type:"int"},
 		{id:"name",type:"varchar(40)"},
-		{id:"color",type:"varchar(10)"}
+		{id:"color",type:"varchar(20)"}
 	],
 	_tableName:"m_tip",
 	init:function(){
