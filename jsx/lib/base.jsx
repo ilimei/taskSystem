@@ -3,6 +3,8 @@ var ReactDOM = require("react-dom");
 var Loader=require("../libui/Loader");
 require("./reactExtend");
 require("./stores/cacheAjax");
+var ContextMenu=require("../libui/ContextMenu");
+import Confirm from "../libui/Confirm";
 
 var Main = React.createClass({
     displayName: 'Main',
@@ -25,11 +27,16 @@ var Main = React.createClass({
             ReactDOM.render(<i/>,modalContainer);
         }
     },
+    confirm:function(content,onOk){
+        showModal(<Confirm onOk={onOk} content={content}/>);
+    },
     componentDidMount:function() {
         document.cookie="token";
         window.loader=this.refs["loader"];
         window.modalContainer=this.refs["modalContainer"];
         window.showModal=this.showModal;
+        window.showContextMenu=this.refs["contextMenu"].show;
+        window.Confirm=this.confirm;
     },
     render:function() {
         return (
@@ -38,9 +45,16 @@ var Main = React.createClass({
                 <Loader ref="loader"></Loader>
                 <div ref="modalContainer"></div>
                 <div ref="modalContainer2"></div>
+                <ContextMenu ref="contextMenu"/>
             </div>
         );
     }
 });
 
 module.exports = Main;
+window.ClientHeight=document.documentElement.clientHeight;
+window.ClientWidth=document.documentElement.clientWidth;
+window.addEventListener("resize",function () {
+    window.ClientHeight=document.documentElement.clientHeight;
+    window.ClientWidth=document.documentElement.clientWidth;
+});
