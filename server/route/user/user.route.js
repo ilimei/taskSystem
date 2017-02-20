@@ -75,6 +75,30 @@ router.post("/listProjects",function(req,res){
     });
 });
 
+router.post("/update",function(req,res){
+    co(function*() {
+        var user = new User();
+        user.id=req.session.userid;
+        var count = yield user.find().where({name: req.body.username})
+            .orWhere({phone: req.body.phone})
+            .orWhere({email: req.body.email}).count();
+        if (count >= 1) {
+            res.json({error: "手机号、用户名或者email有冲突"});
+            throw new Error("手机号、用户名或者email有冲突");
+        }
+        for(var i in req.body){
+            user[i]=req.body[i];
+        }
+        user.uptime = new Date().getTime();
+        req.session.user=JSON.stringify(user);
+        return yield user.update();
+    }).then(function (result) {
+        res.json({success: true, result: result});
+    }).catch(function (err) {
+        console.error(err);
+    });
+});
+
 router.post("/list", function (req, res) {
     co(function*() {
         var user = new User();
