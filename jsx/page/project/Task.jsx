@@ -15,6 +15,8 @@ var TaskItem=require("../../ui/TaskItem");
 var PageNation=require("../../libui/PageNation");
 var RedirectRoute=require("../../lib/router/RedirectRoute");
 var TaskDetail=require("./TaskDetail");
+var DropFilter=require("../../ui/filter/DropFilter");
+var TipTree=require("../../ui/tip/TipTree");
 
 var Tasks=React.createClass({
     getInitialState:function(){
@@ -22,12 +24,17 @@ var Tasks=React.createClass({
             projectId:this.props.projectId,
             data:[],
             page:1,
-            rows:5,
-            total:0
+            rows:10,
+            total:0,
+            filter:-1
         }
     },
     getName:function(){
-        var id=this.props.routeParam.id;
+        var {type}=this.props;
+        var {id}=this.props.routeParam;
+        if(type){
+            return "任务";
+        }
         switch (id){
             case "done": return "已完成的";
             case "pending": return "未完成的";
@@ -38,27 +45,51 @@ var Tasks=React.createClass({
                 else return "所有任务";
         }
     },
+    filterChange:function(filter){
+        this.state.filter=filter;
+        var id=this.props.routeParam.id;
+        this.load(id);
+    },
     renderHeader:function(){
         return <div className="taskHeader">
             {this.getName()}
+            <div className="filter-container">
+                <DropFilter onSelect={this.filterChange}/>
+            </div>
         </div>
     },
     changePage:function(page){
-        var id=this.props.routeParam.id;
+        var {id}=this.props.routeParam;
         this.state.page=page;
-        this.load(id);
+        this.load(id,this.props.type);
     },
-    load:function(id){
-        Ajax("api/task/listProject",{
-            type:id||"all",
-            projectId:this.state.projectId,
-            page:this.state.page,
-            rows:this.state.rows
-        },function(data){
-            this.setState({data:data.result,total:data.count});
-        },this);
+    load:function(id,type){
+        if(type=="tip"){
+            Ajax("api/task/listTip",{
+                tipId:id,
+                projectId:this.state.projectId,
+                page:this.state.page,
+                rows:this.state.rows,
+                filter:this.state.filter
+            },function(data){
+                this.setState({data:data.result,total:data.count});
+            },this);
+        }else{
+            Ajax("api/task/listProject",{
+                type:id||"all",
+                projectId:this.state.projectId,
+                page:this.state.page,
+                rows:this.state.rows,
+                filter:this.state.filter
+            },function(data){
+                this.setState({data:data.result,total:data.count});
+            },this);
+        }
     },
     componentWillReceiveProps:function(nextProp){
+        if(nextProp.type!=this.props.type){
+            this.forceUpdate();
+        }
         var id=this.props.routeParam.id;
         var nId= nextProp.routeParam.id;
         var projectId=this.props.projectId;
@@ -67,20 +98,20 @@ var Tasks=React.createClass({
             this.state.projectId=nextProjectId;
             if(id!=nId){
                 this.state.page=1;
-                this.load(nId);
+                this.load(nId,nextProp.type);
             }else{
-                this.load(id);
+                this.load(id,nextProp.type);
             }
         }else if(id!=nId){
             this.state.page=1;
-            this.load(nId);
+            this.load(nId,nextProp.type);
         }
     },
     componentDidMount:function(){
-        this.load(this.props.routeParam.id);
+        this.load(this.props.routeParam.id,this.props.type);
     },
     removeTask:function(){
-        this.load(this.props.routeParam.id);
+        this.load(this.props.routeParam.id,this.props.type);
     },
     renderData:function(){
         return this.state.data.map(function(v,index){
@@ -97,7 +128,7 @@ var Tasks=React.createClass({
     },
     render:function(){
         var id=this.props.routeParam.id;
-        return <div className="Tasks">
+        return <div className="Project-Tasks">
             {this.renderHeader()}
             <AddTask projectId={this.props.projectId} AddSuccess={this.load.bind(this,this.props.routeParam.id)}/>
             {this.renderData()}
@@ -126,14 +157,17 @@ var Task = React.createClass({
             <HelperMenu title="任务"
                         desc="按已完成和未完成的任务分类"
                         data={this.state.data}>
+                <TipTree projectId={this.props.projectId}/>
                 <div>
                     <div className="helpHeader">所有成员</div>
                     <ListUsers projectId={this.props.projectId}/>
                 </div>
             </HelperMenu>
             <div className="TaskSubContainer">
-                <Router DEBUG>
+                <Router>
                     <Route path="detail/:id" component={TaskDetail} projectId={this.props.projectId}/>
+                    <Route path="tip/detail/:id" component={TaskDetail} projectId={this.props.projectId}/>
+                    <Route path="tip/:id" type="tip" component={Tasks} projectId={this.props.projectId}/>
                     <Route path=":id" component={Tasks} projectId={this.props.projectId}/>
                 </Router>
             </div>
