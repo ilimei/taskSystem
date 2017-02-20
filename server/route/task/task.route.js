@@ -4,7 +4,9 @@ const co = require("co");
 const Project = require("../../modal/Project.modal.js");
 const ProjectUser = require("../../modal/ProjectUser.modal");
 const TaskModal = require("../../modal/Task.modal");
-const User = require("../../modal/User.modal");
+const User = require("../../modal/User.modal.js");
+const Tip=require("../../modal/Tip.modal.js")
+const TipTask=require("../../modal/TipTask.modal");
 
 router.use(function (req, res, next) {
     if (req.session.user) {
@@ -20,16 +22,21 @@ router.post("/getTask",function(req,res){
         return yield task.find().where({id:req.body.id}).one(true);
     }).then(function(data){
         return co(function*() {
-            let [creator, executor, project]=yield [new User().find().where({
+            let [creator, executor, project,tips]=yield [new User().find().where({
                 id: data.creator
             }).one(true), new User().find().where({
                 id: data.executor
             }).one(true), new Project().find().where({
                 id: data.project
-            }).one(true)];
+            }).one(true),new Tip().find().where({
+                id:new TipTask().find(["tip_id"]).where({
+                    task_id:data.id
+                })
+            }).all()];
             data.creator = creator;
             data.executor = executor;
             data.project = project;
+            data.tips=tips;
             return data;
         });
     }).then(function (data) {
@@ -117,16 +124,70 @@ router.post("/listProject", function (req, res) {
         var [count,re]=data;
         var map = re.map(function (v) {
             return co(function*() {
-                let [creator, executor, project]=yield [new User().find().where({
+                let [creator, executor, project,tips]=yield [new User().find().where({
                     id: v.creator
                 }).one(true), new User().find().where({
                     id: v.executor
                 }).one(true), new Project().find().where({
                     id: v.project
-                }).one(true)];
+                }).one(true),new Tip().find().where({
+                    id:new TipTask().find(["tip_id"]).where({
+                        task_id:v.id
+                    })
+                }).all()];
                 v.creator = creator;
                 v.executor = executor;
                 v.project = project;
+                v.tips=tips;
+                return v;
+            });
+        });
+        map.unshift(count);
+        return Promise.all(map);
+    }).then(function (data) {
+        var count = data.shift();
+        res.json({success: true, result: data, count: count});
+    }).catch(err => {
+        console.error(err);
+    });
+});
+
+router.post("/listTip", function (req, res) {
+    co(function*() {
+        var page = parseInt(req.body.page);//第几页 从1开始
+        var rows = parseInt(req.body.rows);//每页多少个
+        let projectId = req.body.projectId;
+        let filter=req.body.filter;
+        let task = new TaskModal();
+        let tipId = req.body.tipId;
+        let query = task.find().where({
+            project: projectId,
+            id:["in",new TipTask().find(["task_id"]).where({tip_id:tipId})],
+            done:filter==-1?null:filter
+        }).orderBy(["done asc","weight desc", "update_time"], true);
+        return yield [
+            query.count(),
+            query.offset((page - 1) * rows).limit(rows).all()
+        ];
+    }).then(function (data) {
+        var [count,re]=data;
+        var map = re.map(function (v) {
+            return co(function*() {
+                let [creator, executor, project,tips]=yield [new User().find().where({
+                    id: v.creator
+                }).one(true), new User().find().where({
+                    id: v.executor
+                }).one(true), new Project().find().where({
+                    id: v.project
+                }).one(true),new Tip().find().where({
+                    id:new TipTask().find(["tip_id"]).where({
+                        task_id:v.id
+                    })
+                }).all()];
+                v.creator = creator;
+                v.executor = executor;
+                v.project = project;
+                v.tips=tips;
                 return v;
             });
         });
@@ -212,16 +273,21 @@ router.post("/listUser", function (req, res) {
         var [count,re]=data;
         var map = re.map(function (v) {
             return co(function*() {
-                let [creator, executor, project]=yield [new User().find().where({
+                let [creator, executor, project,tips]=yield [new User().find().where({
                     id: v.creator
                 }).one(true), new User().find().where({
                     id: v.executor
                 }).one(true), new Project().find().where({
                     id: v.project
-                }).one(true)];
+                }).one(true),new Tip().find().where({
+                    id:new TipTask().find(["tip_id"]).where({
+                        task_id:v.id
+                    })
+                }).all()];
                 v.creator = creator;
                 v.executor = executor;
                 v.project = project;
+                v.tips=tips;
                 return v;
             });
         });
