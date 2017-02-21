@@ -20,6 +20,13 @@ class UEditor extends React.Component{
 
     componentDidMount(){
         this.editor=UE.getEditor(this.refs["container"]);
+        UE.uploadOpt={
+            imageFieldName:"avatar",
+            imageMaxSize:1024*1024,
+            imageUrlPrefix:"/uploads/",
+            imageAllowFiles:["bmp","png","jpg","gif"],
+            imageActionName:ReqUrl+"api/upload/avatar"
+        };
         this.editor.on("ready",this.onReady.bind(this));
         this.editor.on("contentChange",this.onChange.bind(this));
         this.refs["container"].style.width="100%";

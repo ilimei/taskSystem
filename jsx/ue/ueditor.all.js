@@ -8075,37 +8075,37 @@ UE.Editor.defaultOptions = function(editor){
 
     UE.Editor.prototype.loadServerConfig = function(){
         var me = this;
-        setTimeout(function(){
-            try{
-                me.options.imageUrl && me.setOpt('serverUrl', me.options.imageUrl.replace(/^(.*[\/]).+([\.].+)$/, '$1controller$2'));
-
-                var configUrl = me.getActionUrl('config'),
-                    isJsonp = utils.isCrossDomainUrl(configUrl);
-
-                /* 发出ajax请求 */
-                me._serverConfigLoaded = false;
-
-                configUrl && UE.ajax.request(configUrl,{
-                    'method': 'GET',
-                    'dataType': isJsonp ? 'jsonp':'',
-                    'onsuccess':function(r){
-                        try {
-                            var config = isJsonp ? r:eval("("+r.responseText+")");
-                            utils.extend(me.options, config);
-                            me.fireEvent('serverConfigLoaded');
-                            me._serverConfigLoaded = true;
-                        } catch (e) {
-                            showErrorMsg(me.getLang('loadconfigFormatError'));
-                        }
-                    },
-                    'onerror':function(){
-                        showErrorMsg(me.getLang('loadconfigHttpError'));
-                    }
-                });
-            } catch(e){
-                showErrorMsg(me.getLang('loadconfigError'));
-            }
-        });
+        // setTimeout(function(){
+        //     try{
+        //         me.options.imageUrl && me.setOpt('serverUrl', me.options.imageUrl.replace(/^(.*[\/]).+([\.].+)$/, '$1controller$2'));
+        //
+        //         var configUrl = me.getActionUrl('config'),
+        //             isJsonp = utils.isCrossDomainUrl(configUrl);
+        //
+        //         /* 发出ajax请求 */
+        //         me._serverConfigLoaded = false;
+        //
+        //         configUrl && UE.ajax.request(configUrl,{
+        //             'method': 'GET',
+        //             'dataType': isJsonp ? 'jsonp':'',
+        //             'onsuccess':function(r){
+        //                 try {
+        //                     var config = isJsonp ? r:eval("("+r.responseText+")");
+        //                     utils.extend(me.options, config);
+        //                     me.fireEvent('serverConfigLoaded');
+        //                     me._serverConfigLoaded = true;
+        //                 } catch (e) {
+        //                     showErrorMsg(me.getLang('loadconfigFormatError'));
+        //                 }
+        //             },
+        //             'onerror':function(){
+        //                 showErrorMsg(me.getLang('loadconfigHttpError'));
+        //             }
+        //         });
+        //     } catch(e){
+        //         showErrorMsg(me.getLang('loadconfigError'));
+        //     }
+        // });
 
         function showErrorMsg(msg) {
             console && console.error(msg);
@@ -23726,13 +23726,14 @@ UE.plugin.register('autoupload', function (){
             filetype = /image\/\w+/i.test(file.type) ? 'image':'file',
             loadingId = 'loading_' + (+new Date()).toString(36);
 
-        fieldName = me.getOpt(filetype + 'FieldName');
-        urlPrefix = me.getOpt(filetype + 'UrlPrefix');
-        maxSize = me.getOpt(filetype + 'MaxSize');
-        allowFiles = me.getOpt(filetype + 'AllowFiles');
-        actionUrl = me.getActionUrl(me.getOpt(filetype + 'ActionName'));
+        fieldName = UE.uploadOpt[filetype + 'FieldName'];
+        urlPrefix = UE.uploadOpt[filetype + 'UrlPrefix'];
+        maxSize = UE.uploadOpt[filetype + 'MaxSize'];
+        allowFiles = UE.uploadOpt[filetype + 'AllowFiles'];
+        actionUrl = UE.uploadOpt[filetype + 'ActionName'];
         errorHandler = function(title) {
             var loader = me.document.getElementById(loadingId);
+            console.error(title);
             loader && domUtils.remove(loader);
             me.fireEvent('showmessage', {
                 'id': loadingId,
@@ -23747,15 +23748,19 @@ UE.plugin.register('autoupload', function (){
                 me.options.themePath + me.options.theme +
                 '/images/spacer.gif" title="' + (me.getLang('autoupload.loading') || '') + '" >';
             successHandler = function(data) {
-                var link = urlPrefix + data.url,
-                    loader = me.document.getElementById(loadingId);
-                if (loader) {
-                    loader.setAttribute('src', link);
-                    loader.setAttribute('_src', link);
-                    loader.setAttribute('title', data.title || '');
-                    loader.setAttribute('alt', data.original || '');
-                    loader.removeAttribute('id');
-                    domUtils.removeClasses(loader, 'loadingclass');
+                try {
+                    var link = urlPrefix + data.result,
+                        loader = me.document.getElementById(loadingId);
+                    if (loader) {
+                        loader.setAttribute('src', link);
+                        loader.setAttribute('_src', link);
+                        loader.setAttribute('title', data.title || '');
+                        loader.setAttribute('alt', data.original || '');
+                        loader.removeAttribute('id');
+                        domUtils.removeClasses(loader, 'loadingclass');
+                    }
+                }catch(e){
+                    console.error(e);
                 }
             };
         } else {
@@ -23780,7 +23785,7 @@ UE.plugin.register('autoupload', function (){
         me.execCommand('inserthtml', loadingHtml);
 
         /* 判断后端配置是否没有加载成功 */
-        if (!me.getOpt(filetype + 'ActionName')) {
+        if (!UE.uploadOpt[filetype + 'ActionName']) {
             errorHandler(me.getLang('autoupload.errorLoadConfig'));
             return;
         }
@@ -23809,12 +23814,13 @@ UE.plugin.register('autoupload', function (){
         xhr.addEventListener('load', function (e) {
             try{
                 var json = (new Function("return " + utils.trim(e.target.response)))();
-                if (json.state == 'SUCCESS' && json.url) {
+                if (json.success) {
                     successHandler(json);
                 } else {
-                    errorHandler(json.state);
+                    errorHandler(json.message);
                 }
             }catch(er){
+                console.error(er);
                 errorHandler(me.getLang('autoupload.loadError'));
             }
         });
@@ -23887,137 +23893,6 @@ UE.plugin.register('autoupload', function (){
             }
         }
     }
-});
-
-// plugins/autosave.js
-UE.plugin.register('autosave', function (){
-
-    var me = this,
-        //无限循环保护
-        lastSaveTime = new Date(),
-        //最小保存间隔时间
-        MIN_TIME = 20,
-        //auto save key
-        saveKey = null;
-
-    function save ( editor ) {
-
-        var saveData;
-
-        if ( new Date() - lastSaveTime < MIN_TIME ) {
-            return;
-        }
-
-        if ( !editor.hasContents() ) {
-            //这里不能调用命令来删除， 会造成事件死循环
-            saveKey && me.removePreferences( saveKey );
-            return;
-        }
-
-        lastSaveTime = new Date();
-
-        editor._saveFlag = null;
-
-        saveData = me.body.innerHTML;
-
-        if ( editor.fireEvent( "beforeautosave", {
-            content: saveData
-        } ) === false ) {
-            return;
-        }
-
-        me.setPreferences( saveKey, saveData );
-
-        editor.fireEvent( "afterautosave", {
-            content: saveData
-        } );
-
-    }
-
-    return {
-        defaultOptions: {
-            //默认间隔时间
-            saveInterval: 500
-        },
-        bindEvents:{
-            'ready':function(){
-
-                var _suffix = "-drafts-data",
-                    key = null;
-
-                if ( me.key ) {
-                    key = me.key + _suffix;
-                } else {
-                    key = ( me.container.parentNode.id || 'ue-common' ) + _suffix;
-                }
-
-                //页面地址+编辑器ID 保持唯一
-                saveKey = ( location.protocol + location.host + location.pathname ).replace( /[.:\/]/g, '_' ) + key;
-
-            },
-
-            'contentchange': function () {
-
-                if ( !saveKey ) {
-                    return;
-                }
-
-                if ( me._saveFlag ) {
-                    window.clearTimeout( me._saveFlag );
-                }
-
-                if ( me.options.saveInterval > 0 ) {
-
-                    me._saveFlag = window.setTimeout( function () {
-
-                        save( me );
-
-                    }, me.options.saveInterval );
-
-                } else {
-
-                    save(me);
-
-                }
-
-
-            }
-        },
-        commands:{
-            'clearlocaldata':{
-                execCommand:function (cmd, name) {
-                    if ( saveKey && me.getPreferences( saveKey ) ) {
-                        me.removePreferences( saveKey )
-                    }
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            },
-
-            'getlocaldata':{
-                execCommand:function (cmd, name) {
-                    return saveKey ? me.getPreferences( saveKey ) || '' : '';
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            },
-
-            'drafts':{
-                execCommand:function (cmd, name) {
-                    if ( saveKey ) {
-                        me.body.innerHTML = me.getPreferences( saveKey ) || '<p>'+domUtils.fillHtml+'</p>';
-                        me.focus(true);
-                    }
-                },
-                queryCommandState: function () {
-                    return saveKey ? ( me.getPreferences( saveKey ) === null ? -1 : 0 ) : -1;
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            }
-        }
-    }
-
 });
 
 // plugins/charts.js
@@ -24162,277 +24037,6 @@ UE.plugin.register('charts', function (){
 
     }
 
-});
-
-// plugins/section.js
-/**
- * 目录大纲支持插件
- * @file
- * @since 1.3.0
- */
-UE.plugin.register('section', function (){
-    /* 目录节点对象 */
-    function Section(option){
-        this.tag = '';
-        this.level = -1,
-            this.dom = null;
-        this.nextSection = null;
-        this.previousSection = null;
-        this.parentSection = null;
-        this.startAddress = [];
-        this.endAddress = [];
-        this.children = [];
-    }
-    function getSection(option) {
-        var section = new Section();
-        return utils.extend(section, option);
-    }
-    function getNodeFromAddress(startAddress, root) {
-        var current = root;
-        for(var i = 0;i < startAddress.length; i++) {
-            if(!current.childNodes) return null;
-            current = current.childNodes[startAddress[i]];
-        }
-        return current;
-    }
-
-    var me = this;
-
-    return {
-        bindMultiEvents:{
-            type: 'aftersetcontent afterscencerestore',
-            handler: function(){
-                me.fireEvent('updateSections');
-            }
-        },
-        bindEvents:{
-            /* 初始化、拖拽、粘贴、执行setcontent之后 */
-            'ready': function (){
-                me.fireEvent('updateSections');
-                domUtils.on(me.body, 'drop paste', function(){
-                    me.fireEvent('updateSections');
-                });
-            },
-            /* 执行paragraph命令之后 */
-            'afterexeccommand': function (type, cmd) {
-                if(cmd == 'paragraph') {
-                    me.fireEvent('updateSections');
-                }
-            },
-            /* 部分键盘操作，触发updateSections事件 */
-            'keyup': function (type, e) {
-                var me = this,
-                    range = me.selection.getRange();
-                if(range.collapsed != true) {
-                    me.fireEvent('updateSections');
-                } else {
-                    var keyCode = e.keyCode || e.which;
-                    if(keyCode == 13 || keyCode == 8 || keyCode == 46) {
-                        me.fireEvent('updateSections');
-                    }
-                }
-            }
-        },
-        commands:{
-            'getsections': {
-                execCommand: function (cmd, levels) {
-                    var levelFn = levels || ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-
-                    for (var i = 0; i < levelFn.length; i++) {
-                        if (typeof levelFn[i] == 'string') {
-                            levelFn[i] = function(fn){
-                                return function(node){
-                                    return node.tagName == fn.toUpperCase()
-                                };
-                            }(levelFn[i]);
-                        } else if (typeof levelFn[i] != 'function') {
-                            levelFn[i] = function (node) {
-                                return null;
-                            }
-                        }
-                    }
-                    function getSectionLevel(node) {
-                        for (var i = 0; i < levelFn.length; i++) {
-                            if (levelFn[i](node)) return i;
-                        }
-                        return -1;
-                    }
-
-                    var me = this,
-                        Directory = getSection({'level':-1, 'title':'root'}),
-                        previous = Directory;
-
-                    function traversal(node, Directory) {
-                        var level,
-                            tmpSection = null,
-                            parent,
-                            child,
-                            children = node.childNodes;
-                        for (var i = 0, len = children.length; i < len; i++) {
-                            child = children[i];
-                            level = getSectionLevel(child);
-                            if (level >= 0) {
-                                var address = me.selection.getRange().selectNode(child).createAddress(true).startAddress,
-                                    current = getSection({
-                                        'tag': child.tagName,
-                                        'title': child.innerText || child.textContent || '',
-                                        'level': level,
-                                        'dom': child,
-                                        'startAddress': utils.clone(address, []),
-                                        'endAddress': utils.clone(address, []),
-                                        'children': []
-                                    });
-                                previous.nextSection = current;
-                                current.previousSection = previous;
-                                parent = previous;
-                                while(level <= parent.level){
-                                    parent = parent.parentSection;
-                                }
-                                current.parentSection = parent;
-                                parent.children.push(current);
-                                tmpSection = previous = current;
-                            } else {
-                                child.nodeType === 1 && traversal(child, Directory);
-                                tmpSection && tmpSection.endAddress[tmpSection.endAddress.length - 1] ++;
-                            }
-                        }
-                    }
-                    traversal(me.body, Directory);
-                    return Directory;
-                },
-                notNeedUndo: true
-            },
-            'movesection': {
-                execCommand: function (cmd, sourceSection, targetSection, isAfter) {
-
-                    var me = this,
-                        targetAddress,
-                        target;
-
-                    if(!sourceSection || !targetSection || targetSection.level == -1) return;
-
-                    targetAddress = isAfter ? targetSection.endAddress:targetSection.startAddress;
-                    target = getNodeFromAddress(targetAddress, me.body);
-
-                    /* 判断目标地址是否被源章节包含 */
-                    if(!targetAddress || !target || isContainsAddress(sourceSection.startAddress, sourceSection.endAddress, targetAddress)) return;
-
-                    var startNode = getNodeFromAddress(sourceSection.startAddress, me.body),
-                        endNode = getNodeFromAddress(sourceSection.endAddress, me.body),
-                        current,
-                        nextNode;
-
-                    if(isAfter) {
-                        current = endNode;
-                        while ( current && !(domUtils.getPosition( startNode, current ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.previousSibling;
-                            domUtils.insertAfter(target, current);
-                            if(current == startNode) break;
-                            current = nextNode;
-                        }
-                    } else {
-                        current = startNode;
-                        while ( current && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.nextSibling;
-                            target.parentNode.insertBefore(current, target);
-                            if(current == endNode) break;
-                            current = nextNode;
-                        }
-                    }
-
-                    me.fireEvent('updateSections');
-
-                    /* 获取地址的包含关系 */
-                    function isContainsAddress(startAddress, endAddress, addressTarget){
-                        var isAfterStartAddress = false,
-                            isBeforeEndAddress = false;
-                        for(var i = 0; i< startAddress.length; i++){
-                            if(i >= addressTarget.length) break;
-                            if(addressTarget[i] > startAddress[i]) {
-                                isAfterStartAddress = true;
-                                break;
-                            } else if(addressTarget[i] < startAddress[i]) {
-                                break;
-                            }
-                        }
-                        for(var i = 0; i< endAddress.length; i++){
-                            if(i >= addressTarget.length) break;
-                            if(addressTarget[i] < startAddress[i]) {
-                                isBeforeEndAddress = true;
-                                break;
-                            } else if(addressTarget[i] > startAddress[i]) {
-                                break;
-                            }
-                        }
-                        return isAfterStartAddress && isBeforeEndAddress;
-                    }
-                }
-            },
-            'deletesection': {
-                execCommand: function (cmd, section, keepChildren) {
-                    var me = this;
-
-                    if(!section) return;
-
-                    function getNodeFromAddress(startAddress) {
-                        var current = me.body;
-                        for(var i = 0;i < startAddress.length; i++) {
-                            if(!current.childNodes) return null;
-                            current = current.childNodes[startAddress[i]];
-                        }
-                        return current;
-                    }
-
-                    var startNode = getNodeFromAddress(section.startAddress),
-                        endNode = getNodeFromAddress(section.endAddress),
-                        current = startNode,
-                        nextNode;
-
-                    if(!keepChildren) {
-                        while ( current && domUtils.inDoc(endNode, me.document) && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.nextSibling;
-                            domUtils.remove(current);
-                            current = nextNode;
-                        }
-                    } else {
-                        domUtils.remove(current);
-                    }
-
-                    me.fireEvent('updateSections');
-                }
-            },
-            'selectsection': {
-                execCommand: function (cmd, section) {
-                    if(!section && !section.dom) return false;
-                    var me = this,
-                        range = me.selection.getRange(),
-                        address = {
-                            'startAddress':utils.clone(section.startAddress, []),
-                            'endAddress':utils.clone(section.endAddress, [])
-                        };
-                    address.endAddress[address.endAddress.length - 1]++;
-                    range.moveToAddress(address).select().scrollToView();
-                    return true;
-                },
-                notNeedUndo: true
-            },
-            'scrolltosection': {
-                execCommand: function (cmd, section) {
-                    if(!section && !section.dom) return false;
-                    var me = this,
-                        range = me.selection.getRange(),
-                        address = {
-                            'startAddress':section.startAddress,
-                            'endAddress':section.endAddress
-                        };
-                    address.endAddress[address.endAddress.length - 1]++;
-                    range.moveToAddress(address).scrollToView();
-                    return true;
-                },
-                notNeedUndo: true
-            }
-        }
-    }
 });
 
 // plugins/simpleupload.js
