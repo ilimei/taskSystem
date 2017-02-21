@@ -6,6 +6,27 @@ var User=require("../../modal/User.modal");
 var ProjectUser = require("../../modal/ProjectUser.modal");
 var Task=require("../../modal/Task.modal");
 var Query=require("../../lib/query.class");
+var Tip= require("../../modal/Tip.modal");
+
+const defaultTip=["Bug","rgb(217, 92, 92)","未开发","rgb(27, 28, 29)","开发","rgb(59, 131, 192)","研发","rgb(86, 79, 138)","延后","rgb(242, 198, 31)"]
+
+/***
+ * 加入默认项目标签
+ * @param project_id
+ * @return {Promise.<*>}
+ */
+function createDefaultTip(project_id){
+    var tip=new Tip();
+    tip.project_id=project_id;
+    var tasks=[];
+    for(var i=0;i<defaultTip.length;i+=2){
+        tip.color=defaultTip[i+1];
+        tip.name=defaultTip[i];
+        tasks.push(tip.insert());
+    }
+    return Promise.all(tasks);
+
+}
 
 router.use(function (req, res, next) {
     if (req.session.user) {
@@ -59,7 +80,7 @@ router.post("/add", function (req, res) {
         projectUser.user_id = req.session.userid;
         var result = yield project.insert();
         projectUser.id = result.insertId;
-        return yield projectUser.insert();
+        return yield [projectUser.insert(),createDefaultTip(result.insertId)];
     }).then(function (data) {
         res.json({success: true, result: data});
     }).catch(err => {
