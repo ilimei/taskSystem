@@ -5,6 +5,7 @@
 var React=require("react");
 var ReactDOM=require("react-dom");
 require("./ue/UEditor");
+require("./ui/AutoEdit");
 var CodeMirror=require("./codeMirror/codemirror");
 window.CodeMirror=CodeMirror;
 
