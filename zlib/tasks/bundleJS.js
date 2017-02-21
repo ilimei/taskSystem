@@ -108,19 +108,22 @@ let BundleCommon = function () {
             })
             .on("finish", function () {
                 file.contents = buildEnv.getStream();
-                self.push(file);
                 var b = browserify({
                     debug: buildEnv.config.debug
                 });
                 b._ignore = file._ignore;
                 b.transform(shim);
+                var oldPath=process.cwd();
+                process.chdir(buildEnv.buildPath);
                 b.require(cache._data.commonJS)
                     .bundle()
                     .on('error', function (err) {
+                        console.error(err);
                         cb(err);
                     })
                     .pipe(file.contents);
-                cb();
+                process.chdir(oldPath);
+                cb(null,file);
             });
     });
 }
