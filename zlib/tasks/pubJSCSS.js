@@ -13,7 +13,9 @@ let uglifyJS = require("uglify-js");
 
 const miniJS = function () {
     return through2.obj(function (file, enc, cb) {
-        if (file.path.endsWith(".js")) {
+        if(file.path.indexOf("\\ue\\")>-1){
+            cb(null,file);
+        }else if (file.path.endsWith(".js")) {
             debug.log("\tminify > " + file.path);
             let arr = [];
             if (file.isStream()) {
@@ -27,7 +29,18 @@ const miniJS = function () {
                         cb(null,file);
                     });
             } else if (file.isBuffer()) {
-                let result = uglifyJS.minify(file.contents.toString(), {fromString: true});
+                let result = uglifyJS.minify(file.contents.toString(), {
+                    fromString: true,
+                    mangle: {
+                        toplevel: true
+                    },
+                    compress:{
+                    dead_code: true,
+                    global_defs: {
+                        DEBUG: false,
+                        __DEV__:false
+                    }
+                }});
                 file.contents = new Buffer(result.code);
                 cb(null,file);
             }
@@ -48,7 +61,9 @@ const md5JSCSS = function () {
     }
 
     return through2.obj(function (file, enc, cb) {
-        if (file.path.endsWith(".js") || file.path.endsWith(".css")) {
+        if(file.path.indexOf("\\ue\\")>-1){
+            cb(null,file);
+        }else if (file.path.endsWith(".js") || file.path.endsWith(".css")) {
             let str = md5(file.contents);
             let oldPath = file.path.replace(/\\/g, "/");
             file.path = oldPath.replace(/[^/]+(\.[^\.]+)$/, str + "$1");
