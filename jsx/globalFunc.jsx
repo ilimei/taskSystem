@@ -96,7 +96,7 @@ g.CS=function(obj){
             classes.push(i);
         }
     }
-    return classes.join(" ");
+    return classes.concat(Array.prototype.slice.call(arguments,1)).join(" ")
 }
 /***
  * 延时执行 防止多次执行
