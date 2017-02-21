@@ -34,7 +34,7 @@ app.use(bodyParser.json())
 
 
 //指定静态资源(html css js image等)路径
-app.use(express.static(__dirname + '/../out'));
+app.use(express.static(config.staticPath));
 
 //加载route下所有some.route.js文件
 listDepDir("./route/", function (file) {
@@ -68,7 +68,7 @@ app.use(function (req, res, next) {
                 return;
             }
         }
-        res.sendFile(require("path").resolve(__dirname + "/../out/index.html"));
+        res.sendFile(require("path").resolve(config.staticPath+"/index.html"));
     } else {
         next();
     }

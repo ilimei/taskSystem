@@ -6,7 +6,7 @@ const router = require("express").Router();
 const co = require("co");
 var multer  = require('multer')
 var fs = require("fs");
-var upload = multer({ dest: '../out/uploads/' });
+var upload = multer({ dest: App._config.uploadPath });
 
 router.post('/avatar', upload.single('avatar'), function(req, res) {
     console.log(req.body, req.file);
