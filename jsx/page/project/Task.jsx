@@ -52,7 +52,7 @@ var Tasks=React.createClass({
     },
     renderHeader:function(){
         return <div className="taskHeader">
-            {this.getName()}
+            {this.getName()}({this.state.total})
             <div className="filter-container">
                 <DropFilter onSelect={this.filterChange}/>
             </div>
