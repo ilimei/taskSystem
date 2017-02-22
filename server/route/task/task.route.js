@@ -7,6 +7,8 @@ const TaskModal = require("../../modal/Task.modal");
 const User = require("../../modal/User.modal.js");
 const Tip=require("../../modal/Tip.modal.js")
 const TipTask=require("../../modal/TipTask.modal");
+const Query=require("../../lib/query.class");
+const DB=require("../../lib/transactionDB.class");
 
 router.use(function (req, res, next) {
     if (req.session.user) {
@@ -332,6 +334,38 @@ router.post("/add", function (req, res) {
     }).then(function (data) {
         res.json({success: true, result: data});
     }).catch(err => {
+        console.error(err);
+    });
+});
+
+router.post("/addTaskAndTip",function(req,res){
+    var db=new DB(App.dbPool);
+    co(function*() {
+        let task = new TaskModal();
+        var executor = req.body.executor;
+        let ids=JSON.parse(req.body.data);
+        executor = executor == 'false' ? false : executor;
+        task.creator = req.session.userid;
+        task.executor = executor || req.session.userid;
+        task.end_time = req.body.end_time;
+        task.weight = req.body.urgency;
+        task.project = req.body.projectId;
+        task.done = 0;
+        task.name = req.body.name;
+        task.desc = req.body.desc;
+        db.startTransaction();
+        var data=yield task.insert(db);
+        yield new Query(db).insert(TipTask).values(ids.map(v=>{
+            return {task_id:data.insertId,tip_id:v}
+        })).exec();
+        return data;
+    }).then(function (data) {
+        db.commit();
+        db.release();
+        res.json({success: true, result: data,taskId:data.insertId});
+    }).catch(err => {
+        db.rollback();
+        db.release();
         console.error(err);
     });
 });
