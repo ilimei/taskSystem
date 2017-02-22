@@ -28,17 +28,30 @@ var UserDropSearch = React.createClass({
     onUserList:function({result}){
         var {selUserId}=this.state;
         var map=dataMapById(result,"id");
-        this.setState({data:result,loginUser:map[selUserId]});
+        if(result.length){
+            selUserId=result[0].id;
+        }
+        this.setState({data:result,loginUser:map[selUserId],selUserId:selUserId});
     },
     filterUser:function(v){
         this.setState({filter:v});
     },
+    load:function(projectId){
+        cacheAjax("api/project/listUser",{
+            projectId:projectId
+        },this.onUserList);
+    },
     componentDidMount:function(){
         if(!this.props.selUser)
             cacheAjax("api/user/getLoginInfo",{},this.onLoginUser);
-        cacheAjax("api/project/listUser",{
-            projectId:this.props.projectId
-        },this.onUserList);
+        if(this.props.projectId){
+            this.load(this.props.projectId);
+        }
+    },
+    componentWillReceiveProps(nextProps){
+        if(nextProps.projectId!=this.props.projectId){
+            this.load(nextProps.projectId);
+        }
     },
     selUser:function(v){
         callAsFunc(this.props.onSelect,[v]);
@@ -72,13 +85,13 @@ var UserDropSearch = React.createClass({
         this.refs["dropPanel"].focus();
     },
     render: function () {
-        var {loginUser}=this.state;
+        var {loginUser={}}=this.state;
         return <DropAny onShow={this.onShow} focusDrop noDrop={this.props.noDrop} className="UserDropSearch">
-            <NativeDom np="body" body>
+            <NativeDom np="body" body className="userItem noHover">
                 <div className="avatar" >
                     <img src={loginUser.avatar} alt={loginUser.nick_name} title={loginUser.nick_name}/>
                 </div>
-                {this.props.showName&&loginUser.nick_name}
+                <span className="userName">{this.props.showName&&loginUser.nick_name}</span>
             </NativeDom>
             <div className="noOutline" tabIndex="-1" ref="dropPanel">{this.renderDrop()}</div>
         </DropAny>
