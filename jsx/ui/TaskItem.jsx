@@ -190,7 +190,7 @@ var TaskItem = React.createClass({
                 </div>
             </div>
             <div className="executor">
-                <UserDropSearch onSelect={this.updateExecutor} projectId={task.project.id} selUser={task.executor} noDrop={task.done!=0||canSentToOther}/>
+                <UserDropSearch showName onSelect={this.updateExecutor} projectId={task.project.id} selUser={task.executor} noDrop={task.done!=0||canSentToOther}/>
             </div>
             <div className="delTask">
                 <i className="icon-minus-sign" onClick={this.delTask}/>
