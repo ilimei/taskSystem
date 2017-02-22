@@ -114,13 +114,15 @@ class Query {
         this._mulplite=arr.length;
         this._insertFields = [];
         var map=arr[0];
+        var helpFields=[];
         for (var i in map) {
+            helpFields.push(i);
             this._insertFields.push("`" + i + "`");
         }
         arr.forEach(function(map){
-            this._insertFields.forEach(function(key){
+            helpFields.forEach(function(key){
                 this._param.push(map[key]);
-            });
+            },this);
         },this);
         return this;
     }
@@ -254,7 +256,7 @@ class Query {
                     return "?"
                 }).join(",") + ")";
             if (this._mulplite > 1) {
-                return _prevSql + _valueSql.repeat(this._mulplite);
+                return _prevSql + new Array(this._mulplite).fill(_valueSql).join(",");
             } else {
                 return _prevSql + _valueSql;
             }
