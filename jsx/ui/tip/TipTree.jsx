@@ -68,12 +68,17 @@ var TipTree = React.createClass({
             },this);
         }
     },
-    load:function(){
+    load:function(projectId){
         cacheAjax("api/tip/list",{
-            projectId:this.props.projectId
+            projectId:projectId||this.props.projectId
         },function(data){
             this.setState({data:data.data,loading:false});
         },this);
+    },
+    componentWillReceiveProps(nextProps){
+        if(nextProps.projectId!=this.props.projectId){
+            this.load(nextProps.projectId);
+        }
     },
     componentDidMount:function(){
         this.load();
