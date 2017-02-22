@@ -30,7 +30,7 @@ var SelHeadIcon=React.createClass({
                 "avatar": "/headicon/Fruit-"+this.state.sel+".png"
             }, function (data) {
                 user.avatar="/headicon/Fruit-"+this.state.sel+".png";
-                cacheAjaxUpdate("api/project/list",{},user);
+                cacheAjaxUpdate("api/user/getLoginInfo",{},user);
                 this.hide();
             },this);
         }
@@ -40,14 +40,14 @@ var SelHeadIcon=React.createClass({
         var formData=new FormData();
         formData.append("avatar",file);
         var me=this;
-        var user=store.get("loginUser");
+        var user=this.state.user;
         PostFormData("api/upload/avatar",formData).then(function(data){
             var nAvatar="/uploads/"+data.result;
             Ajax("api/user/update",{
                 "avatar":nAvatar
             },function(data){
                 user.avatar=nAvatar;
-                store.set("loginUser",user);
+                cacheAjaxUpdate("api/user/getLoginInfo",{},user);
                 me.hide();
             });
         });
