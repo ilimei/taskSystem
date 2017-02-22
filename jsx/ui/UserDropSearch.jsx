@@ -9,7 +9,8 @@ var Input=require("../form/input");
  */
 var UserDropSearch = React.createClass({
     propTypes:{
-        noDrop:React.PropTypes.bool
+        noDrop:React.PropTypes.bool,
+        preUserId:React.PropTypes.any
     },
     getInitialState:function(){
         return {
@@ -28,8 +29,12 @@ var UserDropSearch = React.createClass({
     onUserList:function({result}){
         var {selUserId}=this.state;
         var map=dataMapById(result,"id");
+        var nameMap=dataMapById(result,"name");
         if(!this.props.selUser&&result.length){
             selUserId=result[0].id;
+        }
+        if(this.props.preUserId&&nameMap[this.props.preUserId]){
+            selUserId=nameMap[this.props.preUserId].id;
         }
         this.setState({data:result,loginUser:map[selUserId],selUserId:selUserId});
     },
@@ -41,6 +46,13 @@ var UserDropSearch = React.createClass({
             projectId:projectId
         },this.onUserList);
     },
+    setPreUser:function(preUserId){
+        var selUserId=preUserId;
+        var map=dataMapById(this.state.data,"name");
+        if(map[selUserId]) {
+            this.selUser(map[selUserId]);
+        }
+    },
     componentDidMount:function(){
         if(!this.props.selUser)
             cacheAjax("api/user/getLoginInfo",{},this.onLoginUser);
@@ -51,6 +63,9 @@ var UserDropSearch = React.createClass({
     componentWillReceiveProps(nextProps){
         if(nextProps.projectId!=this.props.projectId){
             this.load(nextProps.projectId);
+        }
+        if(nextProps.preUserId!=this.props.preUserId){
+            this.setPreUser(nextProps.preUserId);
         }
     },
     selUser:function(v){

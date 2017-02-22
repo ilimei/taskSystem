@@ -130,7 +130,7 @@ var Tasks=React.createClass({
         var id=this.props.routeParam.id;
         return <div className="Project-Tasks">
             {this.renderHeader()}
-            <AddTask projectId={this.props.projectId} AddSuccess={this.load.bind(this,this.props.routeParam.id)}/>
+            <AddTask preUserId={id} projectId={this.props.projectId} AddSuccess={this.load.bind(this,id)}/>
             {this.renderData()}
             {this.renderPageNation()}
         </div>

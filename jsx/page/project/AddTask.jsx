@@ -72,7 +72,7 @@ var AddTask = React.createClass({
                     </NativeDom>
                 </InputGroup>
             </div>
-            <UserDropSearch ref="userDrop" onSelect={this.selUser} projectId={this.props.projectId} foot/>
+            <UserDropSearch preUserId={this.props.preUserId} ref="userDrop" onSelect={this.selUser} projectId={this.props.projectId} foot/>
         </div>
     }
 });
