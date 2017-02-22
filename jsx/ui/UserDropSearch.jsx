@@ -28,7 +28,7 @@ var UserDropSearch = React.createClass({
     onUserList:function({result}){
         var {selUserId}=this.state;
         var map=dataMapById(result,"id");
-        if(result.length){
+        if(!this.props.selUser&&result.length){
             selUserId=result[0].id;
         }
         this.setState({data:result,loginUser:map[selUserId],selUserId:selUserId});
