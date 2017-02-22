@@ -31,6 +31,11 @@ if (process.argv[2] == "start") {
     buildEnv.config.debug=false;
     require("./zlib/tasks/pub");
     gulp.start("pub");
+} else if(process.argv[2]=="eslint"){
+    console.info("检查代码");
+    buildEnv.config.debug=false;
+    require("./zlib/tasks/eslint");
+    gulp.start("lint");
 } else {
     console.info("开始构建项目");
     require("./zlib/tasks/build");
