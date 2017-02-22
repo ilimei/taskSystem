@@ -23,26 +23,32 @@
 		.inputWrap{
 			padding: 4px;
 		}
-		.userItem{
-			height:40px;
-			padding: 2.5px 0;
-			padding-left: 10px;
-			text-align: left;
-			i{
-				min-width: 16px;
-				margin-right:10px;
-				display: inline-block;
-			}
+	}
+	.userItem{
+		height:40px;
+		padding: 2.5px 0;
+		padding-left: 10px;
+		text-align: left;
+		i{
+			min-width: 16px;
+			margin-right:10px;
+			display: inline-block;
+		}
+		&:hover{
+			background: #f0f0f0;
+			cursor:pointer;
+		}
+		&.noHover{
 			&:hover{
-				background: #f0f0f0;
-				cursor:pointer;
+				background: transparent;
+				cursor:default;
 			}
-			.userName{
-				display: inline-block;
-				line-height: 25px;
-				height:25px;
-				margin-left: 4px;
-			}
+		}
+		.userName{
+			display: inline-block;
+			line-height: 25px;
+			height:25px;
+			margin-left: 4px;
 		}
 	}
 }
