@@ -99,7 +99,7 @@ var AutoEdit = React.createClass({
     },
     saveValue:function(e){
         var editor=e.target;
-        editor.style.height="100px";
+        editor.style.height="200px";
         var scrollHeight=editor.scrollHeight;
         if(!this.props.noLimitHeight&&scrollHeight>400){
             scrollHeight=400;
