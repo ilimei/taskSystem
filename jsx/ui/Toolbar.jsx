@@ -5,6 +5,7 @@ var DropIcon=require("./DropIcon");
 var React = require("react");
 var TaskList=require("./Tasklist");
 var LinkFunc=require("../lib/router/LinkFunc");
+import CreateTask from "../page/dialog/CreateTask";
 
 var Toolbar = React.createClass({
     getInitialState:function(){
@@ -16,10 +17,16 @@ var Toolbar = React.createClass({
                 {"text":"退出登录",icon:"icon-cloud-download",click:this.logout},
             ],
             data:[
-                {text:"创建项目",icon:"coding-project"},
-                {text:"创建任务",icon:"icon-tasks"}
+                {text:"创建项目",icon:"coding-project",click:this.createProject},
+                {text:"创建任务",icon:"icon-tasks",click:this.createTask}
             ]
         }
+    },
+    createTask(){
+        showModal(<CreateTask/>)
+    },
+    createProject(){
+        LinkFunc("/user/project/create");
     },
     myTask:function(){
         LinkFunc("/user/tasks/all");
