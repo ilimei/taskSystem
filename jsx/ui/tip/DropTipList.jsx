@@ -11,29 +11,45 @@ var DropTipList = React.createClass({
             selList:this.props.selList||[]
         }
     },
-    load:function(){
+    load:function(projectId){
         cacheAjax("api/tip/list",{
-            projectId:this.props.projectId
+            projectId:projectId
         },function(data){
             this.setState({data:data.data,loading:false});
         },this);
     },
     onSelect:function(){
-        Ajax("api/tip/addTaskTip",{
-            data:JSON.stringify(this.state.selList),
-            taskId:this.props.taskId,
-            projectId:this.props.projectId
-        },function(data){
-            var map=dataMapById(this.state.data,"id");
-            var result=this.state.selList.map(function(v){
+        if(this.props.taskId) {
+            Ajax("api/tip/addTaskTip", {
+                data: JSON.stringify(this.state.selList),
+                taskId: this.props.taskId,
+                projectId: this.props.projectId
+            }, function (data) {
+                var map = dataMapById(this.state.data, "id");
+                var result = this.state.selList.map(function (v) {
+                    return map[v];
+                });
+                callAsFunc(this.props.onSelect, [result]);
+                this.refs["dropAny"].hide();
+            }, this);
+        }else{
+            var map = dataMapById(this.state.data, "id");
+            var result = this.state.selList.map(function (v) {
                 return map[v];
             });
-            callAsFunc(this.props.onSelect,[result]);
+            callAsFunc(this.props.onSelect, [result]);
             this.refs["dropAny"].hide();
-        },this);
+        }
     },
     componentDidMount:function(){
-        this.load();
+        if(this.props.projectId)
+            this.load(this.props.projectId);
+    },
+    componentWillReceiveProps(nextProps){
+        if(nextProps.projectId!=this.props.projectId){
+            this.load(nextProps.projectId);
+            this.state.selList=nextProps.selList||[];
+        }
     },
     selTip:function(v,selIndex){
         if(selIndex>-1){
