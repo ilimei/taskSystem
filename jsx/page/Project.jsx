@@ -9,7 +9,7 @@ var Task=require("./project/Task");
 var Users=require("./project/Users");
 var React = require("react");
 var ProjectDrop=require("../ui/ProjectDrop");
-var Docs=require("./project/Docs");
+var Docs=require("./project/doc/Docs");
 /***
  * React Component Project create by ZhangLiwei at 16:35
  */
