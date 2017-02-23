@@ -22,7 +22,12 @@ var Login = React.createClass({
             }else{
                 window.user=data.result;
                 localStorage.setItem("user",JSON.stringify(window.user));
-                Link("/user/project/all");
+                var fromUrl=getUrlParam("f")
+                if(fromUrl){
+                    window.location.href=decodeURIComponent(fromUrl);
+                }else {
+                    Link("/user/project/all");
+                }
             }
         });
     },
