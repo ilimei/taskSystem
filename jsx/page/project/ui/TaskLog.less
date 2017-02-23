@@ -1,0 +1,41 @@
+/***
+ * TaskLog class create by ZhangLiwei at 11:39
+**/
+.TaskLog {
+	@radius:24px;
+	&:after{
+		content:"";
+		display:block;
+		margin-bottom:20px;
+		border-bottom: 2px solid #ccc;
+	}
+	.logItem{
+		font-size:12px;
+		&:after{
+			content:"";
+			height:20px;
+			width: @radius/2+1px;
+			display:block;
+			border-right:2px solid #ccc;
+		}
+	}
+	.log-icon{
+		display:inline-block;
+		width:@radius;
+		height:@radius;
+		line-height: @radius;
+		text-align: center;
+		background:#ccc;
+		border-radius: 100%;
+		margin-right:4px;
+	}
+	.user{
+		color:#333;
+		font-weight:bold;
+		margin-right: 4px;
+	}
+	.time{
+		color:#bbb;
+		margin-left:10px;
+	}
+}
