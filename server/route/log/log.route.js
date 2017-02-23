@@ -12,7 +12,11 @@ router.use(function (req, res, next) {
         next();
         return;
     }
-    res.redirect(301, "/login");
+    if(req.header("CONTENT-TYPE")=="application/x-www-form-urlencoded"){
+        res.json({error:"noLogin"});
+    }else {
+        res.redirect(301, "/login");
+    }
 });
 
 router.post("/getTaskLog",function(req,res){
