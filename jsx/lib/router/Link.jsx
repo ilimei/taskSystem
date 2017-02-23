@@ -7,9 +7,11 @@ var cache={
     state:{}
 }
 
+var oneOfType=React.PropTypes.oneOfType;
+
 var Link=React.createClass({
     propTypes: {
-        to: _InternalPropTypes.string,
+        to: oneOfType([_InternalPropTypes.string,React.PropTypes.number]),
         param:_InternalPropTypes.object,
         activeClass:_InternalPropTypes.string
     },

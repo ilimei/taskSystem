@@ -2,6 +2,7 @@
  * React Component Tree create by ZhangLiwei at 13:27
  */
 var React = require("react");
+var Link=require("../lib/router/Link");
 
 var TreeNode = React.createClass({
     propTypes:{
@@ -49,7 +50,7 @@ var TreeNode = React.createClass({
         var cls=CS({
             "active":treeItem.active
         },"tree_item");
-        return <div className={cls}
+        return <Link to={"file/"+treeItem.id+"/00"} activeClass="active" className={cls}
                     onClick={this.onSelect}
                     onContextMenu={this.props.handleContextMenu}>
             <span className="tree_space" style={style}></span>
@@ -57,7 +58,7 @@ var TreeNode = React.createClass({
                 <i className={treeItem.icon||"icon-file-alt"}/>
             </span>
             <span className="tree_text">{this.renderText(treeItem)}</span>
-        </div>
+        </Link>
     },
     handleEndEdit: function (treeItem, e) {
         if (e.type == "blur") {
