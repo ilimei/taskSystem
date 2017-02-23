@@ -1,14 +1,17 @@
 var React = require("react");
-var Split = require("../../ui/Split");
-var HelpMenu = require("../../ui/HelperMenu");
-var Tree = require("../../libui/Tree");
-var Paper = require("../../libui/Paper");
-var UEditor = require("../../ue/UEditor");
-import UEAddDoc from "./dialog/DocDialog";
-import MarkedDocDialog from "./dialog/MarkedDocDialog";
+var Split = require("../../../ui/Split");
+var HelpMenu = require("../../../ui/HelperMenu");
+var Tree = require("../../../libui/Tree");
+var Paper = require("../../../libui/Paper");
+var UEditor = require("../../../ue/UEditor");
+var Router=require("../../../lib/router/Router");
+var Route=require("../../../lib/router/Route");
+var Link =require("../../../lib/router/Link");
+import UEAddDoc from "../dialog/DocDialog";
+import MarkedDocDialog from "../dialog/MarkedDocDialog";
 
 import Marked from "marked"
-import hljs  from '../../marked/highlight';
+import hljs  from '../../../marked/highlight';
 Marked.setOptions({
     renderer: new Marked.Renderer({
         highlight: function (code, lang) {
@@ -36,7 +39,9 @@ class DocPaper extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            docNode:null
+        };
         this.onHash = this.onHash.bind(this);
     }
 
@@ -44,30 +49,55 @@ class DocPaper extends React.Component {
         this.findHashScroll(location.hash);
     }
 
-    findHashScroll(hash){
-        if(this.props.docNode) {
+    findHashScroll(){
+        if(this.state.docNode) {
+            var {item}=this.props.routeParam;
+            console.info("item:"+item);
             var scrollDiv = this.refs["scrollDiv"];
-            var toDiv = document.querySelector(hash);
+            var toDiv = document.querySelector("#node"+item);
             var top = 0;
             while (toDiv && toDiv != scrollDiv) {
                 top += toDiv.offsetTop;
+                console.info(toDiv);
+                console.info(top);
                 toDiv = toDiv.offsetParent;
             }
+            console.info(top);
             scrollDiv.scrollTop = top;
         }
     }
 
-    componentDidMount() {
-        window.addEventListener("hashchange", this.onHash);
-        this.findHashScroll(location.hash);
+    load(id){
+        if(id) {
+            Ajax("api/doc/getDetailDoc", {
+                id: id,
+                projectId: this.props.projectId
+            }, data => {
+                this.setState({docNode: data.result});
+            }, this);
+        }
     }
 
-    componentWillUnmount() {
-        window.removeEventListener("hashchange", this.onHash);
+    componentDidUpdate(){
+        this.findHashScroll();
+    }
+
+    componentDidMount() {
+        var {id}=this.props.routeParam;
+        this.load(id);
+    }
+    
+    componentWillReceiveProps(nextProps){
+        if(nextProps.routeParam.id!=this.props.routeParam.id){
+            this.load(nextProps.routeParam.id);
+        }
+        if(nextProps.routeParam.item!=this.props.routeParam.item){
+            this.findHashScroll();
+        }
     }
 
     onSaveMark(obj) {
-        let {docNode}=this.props;
+        let {docNode}=this.state;
         obj.parent = docNode.id;
         obj.type = 3;
         obj.editor = 2;
@@ -82,7 +112,7 @@ class DocPaper extends React.Component {
     }
 
     onSaveUE(obj) {
-        let {docNode}=this.props;
+        let {docNode}=this.state;
         obj.parent = docNode.id;
         obj.type = 3;
         obj.editor = 1;
@@ -117,7 +147,7 @@ class DocPaper extends React.Component {
     }
 
     onRemove(treeItem, index) {
-        let {docNode}=this.props;
+        let {docNode}=this.state;
         Confirm("确定删除【"+treeItem.title+"】么？",()=>{
             Ajax("api/doc/del",{
                 id:treeItem.id
@@ -137,11 +167,11 @@ class DocPaper extends React.Component {
     }
 
     renderHeader() {
-        var {docNode}=this.props;
+        var {docNode}=this.state;
         if (docNode) {
             let child = docNode.child && docNode.child.map(function (v, index) {
                     return <div key={v.id} className="header-item">
-                        <a href={"#node" + v.id}>{v.title}</a>
+                        <Link to={"../"+v.id}>{v.title}</Link>
                         <i className="icon-edit" onClick={this.onEdit.bind(this, v)}/>
                         <i className="icon-remove" onClick={this.onRemove.bind(this, v, index)}/>
                     </div>
@@ -151,7 +181,7 @@ class DocPaper extends React.Component {
     }
 
     renderContent() {
-        var {docNode}=this.props;
+        var {docNode}=this.state;
         if (docNode)
             return docNode.child && docNode.child.map(function (v) {
                     var obj = {__html: ""};
@@ -168,7 +198,7 @@ class DocPaper extends React.Component {
     }
 
     renderPaper() {
-        var {docNode}=this.props;
+        var {docNode}=this.state;
         if (docNode) {
             return <div className="pageTitle">
                 <h1>{docNode.title}</h1>
@@ -342,7 +372,10 @@ var Docs = React.createClass({
                       onBeforeSelect={this.onBeforeSelect}
                       onEndEdit={this.handleEndEdit} onContextMenu={this.handleContextMenu}/>
             </HelpMenu>
-            <DocPaper docNode={this.state.docNode}/>
+            <Router>
+                <Route path="file/:id/:item" component={DocPaper} projectId={this.props.projectId}/>
+                <Route path="*" component={DocPaper} projectId={this.props.projectId}/>
+            </Router>
         </Split>
     }
 });
