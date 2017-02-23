@@ -16,7 +16,11 @@ router.use(function (req, res, next) {
         next();
         return;
     }
-    res.redirect(301, "/login");
+    if(req.header("CONTENT-TYPE")=="application/x-www-form-urlencoded"){
+        res.json({error:"noLogin"});
+    }else {
+        res.redirect(301, "/login");
+    }
 });
 
 function getChild(data,doc){
@@ -53,6 +57,20 @@ router.post("/getDoc",function(req,res){
         root.child= lst;
         yield getChild(lst,doc);
         return root;
+    }).then(function (data) {
+        res.json({success: true, result: data});
+    }).catch(err => {
+        console.error(err);
+    });
+});
+
+router.post("/getDetailDoc",function(req,res){
+    co(function*() {
+        let doc = new Doc();
+        doc=yield doc.find().where({id:req.body.id}).one(true);
+        let lst=yield new Doc().find().where({parent:req.body.id}).all();
+        doc.child=lst;
+        return doc;
     }).then(function (data) {
         res.json({success: true, result: data});
     }).catch(err => {
