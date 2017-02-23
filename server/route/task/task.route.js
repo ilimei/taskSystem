@@ -9,6 +9,8 @@ const Tip=require("../../modal/Tip.modal.js")
 const TipTask=require("../../modal/TipTask.modal");
 const Query=require("../../lib/query.class");
 const DB=require("../../lib/transactionDB.class");
+const TaskLog=require("../../modal/TaskLog.modal");
+const logUtil=require("../log/logUtil");
 
 router.use(function (req, res, next) {
     if (req.session.user) {
@@ -309,8 +311,22 @@ router.post("/update", function (req, res) {
         for (var i in req.body) {
             task[i] = req.body[i];
         }
-        return yield task.update();
-    }).then(function (data) {
+        var data=yield task.update();
+        return [yield task.find().where({id:task.id}).one(),data];
+    }).then(function ([task,data]) {
+        if(req.body.executor){
+            delayDo(logUtil.changeTaskExecutor,null,JSON.parse(req.session.user),task);
+        }else if(req.body.end_time){
+            delayDo(logUtil.changeTaskEndTime,null,JSON.parse(req.session.user),task);
+        }else if(req.body.name){
+            delayDo(logUtil.changeTaskName,null,JSON.parse(req.session.user),task);
+        }else if(req.body.desc){
+            delayDo(logUtil.changeTaskDesc,null,JSON.parse(req.session.user),task);
+        }else if(req.body.done!=undefined){
+            delayDo(logUtil.changeTaskDone,null,JSON.parse(req.session.user),task);
+        }else if(req.body.weight!=undefined){
+            delayDo(logUtil.changeTaskUrgency,null,JSON.parse(req.session.user),task);
+        }
         res.json({success: true, result: data});
     }).catch(err => {
         console.error(err);
@@ -330,8 +346,11 @@ router.post("/add", function (req, res) {
         task.done = 0;
         task.name = req.body.name;
         task.desc = req.body.desc;
-        return yield task.insert();
-    }).then(function (data) {
+        let data=yield task.insert();
+        task.id=data.insertId;
+        return [task,data];
+    }).then(function ([task,data]) {
+        delayDo(logUtil.addTask,null,JSON.parse(req.session.user),task);
         res.json({success: true, result: data});
     }).catch(err => {
         console.error(err);
@@ -358,10 +377,12 @@ router.post("/addTaskAndTip",function(req,res){
         yield new Query(db).insert(TipTask).values(ids.map(v=>{
             return {task_id:data.insertId,tip_id:v}
         })).exec();
-        return data;
-    }).then(function (data) {
+        task.id=data.insertId;
+        return [task,data];
+    }).then(function ([task,data]) {
         db.commit();
         db.release();
+        delayDo(logUtil.addTask,null,JSON.parse(req.session.user),task);
         res.json({success: true, result: data,taskId:data.insertId});
     }).catch(err => {
         db.rollback();
