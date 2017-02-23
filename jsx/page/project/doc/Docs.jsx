@@ -50,20 +50,18 @@ class DocPaper extends React.Component {
     }
 
     findHashScroll(){
+        var scrollDiv = this.refs["scrollDiv"];
         if(this.state.docNode) {
             var {item}=this.props.routeParam;
-            console.info("item:"+item);
-            var scrollDiv = this.refs["scrollDiv"];
             var toDiv = document.querySelector("#node"+item);
             var top = 0;
             while (toDiv && toDiv != scrollDiv) {
                 top += toDiv.offsetTop;
-                console.info(toDiv);
-                console.info(top);
                 toDiv = toDiv.offsetParent;
             }
-            console.info(top);
             scrollDiv.scrollTop = top;
+        }else{
+            scrollDiv.scrollTop=0;
         }
     }
 
@@ -75,6 +73,8 @@ class DocPaper extends React.Component {
             }, data => {
                 this.setState({docNode: data.result});
             }, this);
+        }else{
+            this.setState({docNode:null});
         }
     }
 
