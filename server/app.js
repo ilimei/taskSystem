@@ -64,7 +64,7 @@ app.use(function (req, res, next) {
             }
         } else {
             if (path == "/login" || path == "/register") {
-                res.redirect("/user");
+                res.redirect("/user/project");
                 return;
             }
         }
