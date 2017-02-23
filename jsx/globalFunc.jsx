@@ -270,3 +270,15 @@ g.PostFormData=function(url,formData){
         xhr.send(formData);
     });
 }
+
+const param=(function(){
+    var param={};
+    location.search.replace(/[?&]([^=])=([^&]+)]/g,function (m,$1,$2) {
+        param[$1]=$2;
+    });
+    return param;
+})();
+
+g.getUrlParam=function(name){
+    return param[name];
+}
