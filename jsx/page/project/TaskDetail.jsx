@@ -6,6 +6,7 @@ var TaskUrgencyDrop=require("../../ui/TaskUrgencyDrop");
 var DropIcon=require("../../ui/DropIcon");
 var DropCalendar=require("../../ui/DropCalendar");
 var DropTipList=require("../../ui/tip/DropTipList");
+var TaskLog=require("./ui/TaskLog").default;
 /***
  * React Component TaskDetail create by ZhangLiwei at 12:47
  */
@@ -177,6 +178,7 @@ var TaskDetail = React.createClass({
                             <i className="icon-save" onClick={this.changeDesc}/>
                         </AutoEdit>
                     </div>
+                    <TaskLog taskId={task.id} projectId={project.id}/>
                 </div>
                 <div className="set">
                     <div className="title">所属项目</div>
