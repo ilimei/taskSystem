@@ -5,6 +5,8 @@ import React from "react"
 import CodeMirror from "./codemirror";
 import "./sql";
 
+const oneOfType=React.PropTypes.oneOfType;
+
 class CodeEditor extends React.Component {
 
     /***
@@ -22,7 +24,7 @@ class CodeEditor extends React.Component {
     static propTypes = {
         value: React.PropTypes.string,
         mode: React.PropTypes.string,
-        height: React.PropTypes.string | React.PropTypes.number,
+        height: oneOfType([React.PropTypes.string , React.PropTypes.number]),
         onChange: React.PropTypes.func,
         onKeyDown: React.PropTypes.func,
         onPaste: React.PropTypes.func
