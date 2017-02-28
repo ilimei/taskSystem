@@ -14,16 +14,20 @@ if (!global.App) {
 }
 var Modal=require("./modal.class");
 
+const sqlLogger=getLogger("sql");
 function QueryPromise(sql, param,db) {
     let executor=db||pool;
     return new Promise(function (resolve, reject) {
         let logIndex = 0;
-        log("execute sql " + sql.replace(/\?/g, function (matchStr, index) {
-                return param[logIndex++];
-            }));
+        let sqlStr=sql.replace(/\?/g,function(matchStr,index){
+            return param[logIndex++];
+        });
         executor.query(sql, param, function (err, rows, fields) {
             if (err) {
+                sqlLogger.error(sqlStr);
                 reject(err);
+            }else{
+                sqlLogger.info(sqlStr);
             }
             resolve({rows: rows, fields: fields});
         });

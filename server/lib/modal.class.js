@@ -18,18 +18,21 @@ if (!global.App) {
 } else {
     pool = App.dbPool;
 }
-
+const sqlLogger=getLogger("sql");
 function QueryPromise(sql, param,db) {
     let executor=db||pool;
     if (param != undefined) {
         return new Promise(function (resolve, reject) {
             let logIndex=0;
-            log("execute sql "+sql.replace(/\?/g,function(matchStr,index){
-                    return param[logIndex++];
-                }));
+            let sqlStr=sql.replace(/\?/g,function(matchStr,index){
+                return param[logIndex++];
+            });
             executor.query(sql, param, function (err, rows, fields) {
                 if (err) {
+                    sqlLogger.error(sqlStr)
                     reject(err);
+                }else{
+                    sqlLogger.info(sqlStr);
                 }
                 resolve({rows: rows, fields: fields});
             });
@@ -69,12 +72,15 @@ var Query = MakeClass({
         return this;
     },
     _addQueryFilter:function(arr,id,op,value){
-        if(value instanceof Query){
-            this._param=this._param.concat(value._param);
-            arr.push(id+" "+op+" ("+value.toString()+")");
-        }else{
+        if (value instanceof Query) {
+            this._param = this._param.concat(value._param);
+            arr.push(id + " " + op + " (" + value.toString() + ")");
+        } else if(Array.isArray(value)){
+            this._param=this._param.concat(value);
+            arr.push(id+" "+op+" ("+value.map(()=>"?").join(",")+")");
+        } else {
             this._param.push(value);
-            arr.push(id+" "+op+" ?");
+            arr.push(id + " " + op + " ?");
         }
     },
     _relexQueryMap: function (map) {
