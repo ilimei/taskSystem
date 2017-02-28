@@ -1,8 +1,8 @@
 var http = require("http");
 var router = require("express").Router();
 var User = require("../../modal/User.modal.js");
-var Project=require("../../modal/Project.modal");
-var ProjectUser=require("../../modal/ProjectUser.modal");
+var Project = require("../../modal/Project.modal");
+var ProjectUser = require("../../modal/ProjectUser.modal");
 var co = require("co");
 
 router.post("/login", function (req, res) {
@@ -45,7 +45,7 @@ router.post("/register", function (req, res) {
             throw new Error("已结被注册了");
         }
         user.name = req.body.username;
-        user.nick_name=req.body.nickname;
+        user.nick_name = req.body.nickname;
         user.phone = req.body.phone;
         user.email = req.body.email;
         user.password = req.body.password;
@@ -61,13 +61,13 @@ router.post("/register", function (req, res) {
     });
 });
 
-router.post("/listProjects",function(req,res){
+router.post("/listProjects", function (req, res) {
     co(function*() {
         var project = new Project();
-        var projectUser=new ProjectUser();
+        var projectUser = new ProjectUser();
         return yield project.find().where({
-                id:projectUser.find(["id"]).where({"user_id":req.session.userid})
-            }).all();
+            id: projectUser.find(["id"]).where({"user_id": req.session.userid})
+        }).all();
     }).then(function (result) {
         res.json({success: true, result: result});
     }).catch(function (err) {
@@ -75,10 +75,10 @@ router.post("/listProjects",function(req,res){
     });
 });
 
-router.post("/update",function(req,res){
+router.post("/update", function (req, res) {
     co(function*() {
         var user = new User();
-        user.id=req.session.userid;
+        user.id = req.session.userid;
         var count = yield user.find().where({name: req.body.username})
             .orWhere({phone: req.body.phone})
             .orWhere({email: req.body.email}).count();
@@ -86,11 +86,11 @@ router.post("/update",function(req,res){
             res.json({error: "手机号、用户名或者email有冲突"});
             throw new Error("手机号、用户名或者email有冲突");
         }
-        for(var i in req.body){
-            user[i]=req.body[i];
+        for (var i in req.body) {
+            user[i] = req.body[i];
         }
         user.uptime = new Date().getTime();
-        req.session.user=JSON.stringify(user);
+        req.session.user = JSON.stringify(user);
         return yield user.update();
     }).then(function (result) {
         res.json({success: true, result: result});
@@ -117,7 +117,6 @@ router.post("/list", function (req, res) {
 });
 
 router.post("/getLoginInfo", function (req, res) {
-    console.info(req.session.user);
     if (req.session.user) {
         res.json(JSON.parse(req.session.user));
     } else {
@@ -126,11 +125,11 @@ router.post("/getLoginInfo", function (req, res) {
 });
 
 router.post("/logout", function (req, res) {
-    req.session.destroy(function(err) {
-        if(err){
-            res.json({success: false,err:err});
-        }else{
-            res.json({success:true});
+    req.session.destroy(function (err) {
+        if (err) {
+            res.json({success: false, err: err});
+        } else {
+            res.json({success: true});
         }
     });
 });
