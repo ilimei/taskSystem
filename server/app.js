@@ -25,6 +25,15 @@ app.use(session({
     saveUninitialized: true
 }));
 
+const log4js=require("log4js");
+log4js.configure(config.logConfig);
+global.getLogger=function(name){
+    var logger = log4js.getLogger(name);
+    return logger;
+}
+app.use(log4js.connectLogger(getLogger('express'), {level:'auto', format:':method :url'}));
+
+
 //醉了 必须提供数据解析插件
 var bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded
@@ -36,20 +45,37 @@ app.use(bodyParser.json())
 //指定静态资源(html css js image等)路径
 app.use(express.static(config.staticPath));
 
+const systemLogger=getLogger("system");
+/**
+ * 记录请求时间
+ */
+app.use(function(req,res,next){
+    req._startTime=(new Date()-0);
+    req._req_path=req.path;
+    var calResponseTime = function () {
+        var now = new Date(); //获取时间 t2
+        var deltaTime = now - req._startTime;
+        systemLogger.info(req.method+" "+req._req_path+" cost time "+deltaTime+" ms");
+    }
+
+    res.once('finish', calResponseTime);
+    res.once('close', calResponseTime);
+    return next();
+});
+
+
 //加载route下所有some.route.js文件
 listDepDir("./route/", function (file) {
     if (file.endsWith(".route.js")) {
-        console.info(file);
+        systemLogger.info(file);
         require(file)(app);
     }
 });
 
 //拦截非api请求 直接交给前台处理
 app.use(function (req, res, next) {
-    // console.log('Time:', Date.now());
     var path = req.path.replace(/\/+|\\/g, "/");
     req.path=req.path.replace(/\/+|\\/g, "/");
-    console.info(path);
     if (path == "/") {
         if (req.session.userid) {
             res.redirect("/user/all");
@@ -109,7 +135,6 @@ app.get("/api/stop", function (req, res) {
 
 var clients = [];
 io.on('connection', function (socket) {
-    console.log('has connected');
     clients.push(socket);
     socket.on('msg', function (msg) {
         socket.emit('msg', {});
@@ -137,6 +162,5 @@ http.on('error', function () {
 });
 
 http.listen('8808', function () {
-    console.log('listening on *:8808');
-    console.info("open the http://localhost:8808");
+    systemLogger.info('listening on *:8808');
 });
