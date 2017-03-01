@@ -22,6 +22,7 @@ const sqlLogger=getLogger("sql");
 function QueryPromise(sql, param,db) {
     let executor=db||pool;
     if (param != undefined) {
+        var _start_date=new Date()-0;
         return new Promise(function (resolve, reject) {
             let logIndex=0;
             let sqlStr=sql.replace(/\?/g,function(matchStr,index){
@@ -33,6 +34,7 @@ function QueryPromise(sql, param,db) {
                     reject(err);
                 }else{
                     sqlLogger.info(sqlStr);
+                    sqlLogger.info("cost time "+(new Date()-_start_date)+"ms");
                 }
                 resolve({rows: rows, fields: fields});
             });
