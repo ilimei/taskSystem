@@ -13,17 +13,4 @@ var ProjectUser=MakeClass({
     }
 },ModalClass,"ProjectUser");
 
-function test(){
-    let co=require("co");
-    co(function*(){
-        var project=new ProjectUser();
-        return yield [project.drop(),project.create()];
-    }).then(function(result){
-        console.info(result);
-    }).catch(function(err){
-        console.info(err.message);
-    });
-}
-// test();
-
 module.exports=ProjectUser;
