@@ -7,223 +7,15 @@ var UEditor = require("../../../ue/UEditor");
 var Router=require("../../../lib/router/Router");
 var Route=require("../../../lib/router/Route");
 var Link =require("../../../lib/router/Link");
-import UEAddDoc from "../dialog/DocDialog";
-import MarkedDocDialog from "../dialog/MarkedDocDialog";
+var TaskDetail=require("../TaskDetail");
 
-import Marked from "marked"
-import hljs  from '../../../marked/highlight';
-Marked.setOptions({
-    renderer: new Marked.Renderer({
-        highlight: function (code, lang) {
-            if (lang)
-                return hljs.highlightAuto(code, [lang]).value;
-            else
-                return hljs.highlightAuto(code).value;
-        }
-    }),
-    gfm: true,
-    breaks: true,
-    highlight: function (code, lang) {
-        if (lang)
-            return hljs.highlightAuto(code, [lang]).value;
-        else
-            return hljs.highlightAuto(code).value;
-    }
-});
+import TaskSelectDialog from "./TaskSelectDialog";
+
+import DocPaper from "./DocPaper";
+import CreateTask from "../../dialog/CreateTask";
 
 
-class DocPaper extends React.Component {
-    static propTypes = {
-        docNode: React.PropTypes.any
-    }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            docNode:null
-        };
-        this.onHash = this.onHash.bind(this);
-    }
-
-    onHash(e) {
-        this.findHashScroll(location.hash);
-    }
-
-    findHashScroll(){
-        var scrollDiv = this.refs["scrollDiv"];
-        if(this.state.docNode) {
-            var {item}=this.props.routeParam;
-            var toDiv = document.querySelector("#node"+item);
-            var top = 0;
-            while (toDiv && toDiv != scrollDiv) {
-                top += toDiv.offsetTop;
-                toDiv = toDiv.offsetParent;
-            }
-            scrollDiv.scrollTop = top;
-        }else{
-            scrollDiv.scrollTop=0;
-        }
-    }
-
-    load(id){
-        if(id) {
-            Ajax("api/doc/getDetailDoc", {
-                id: id,
-                projectId: this.props.projectId
-            }, data => {
-                this.setState({docNode: data.result});
-            }, this);
-        }else{
-            this.setState({docNode:null});
-        }
-    }
-
-    componentDidUpdate(){
-        this.findHashScroll();
-    }
-
-    componentDidMount() {
-        var {id}=this.props.routeParam;
-        this.load(id);
-    }
-    
-    componentWillReceiveProps(nextProps){
-        if(nextProps.routeParam.id!=this.props.routeParam.id){
-            this.load(nextProps.routeParam.id);
-        }
-        if(nextProps.routeParam.item!=this.props.routeParam.item){
-            this.findHashScroll();
-        }
-    }
-
-    onSaveMark(obj) {
-        let {docNode}=this.state;
-        obj.parent = docNode.id;
-        obj.type = 3;
-        obj.editor = 2;
-        obj.project_id = this.props.projectId;
-        Ajax("api/doc/add", obj, function (data) {
-            obj.id = data.result.insertId;
-            obj.isEdit = true;
-            !docNode.child && (docNode.child = []);
-            docNode.child.push(obj);
-            this.forceUpdate();
-        }, this);
-    }
-
-    onSaveUE(obj) {
-        let {docNode}=this.state;
-        obj.parent = docNode.id;
-        obj.type = 3;
-        obj.editor = 1;
-        obj.project_id = this.props.projectId;
-        Ajax("api/doc/add", obj, function (data) {
-            obj.id = data.result.insertId;
-            obj.isEdit = true;
-            !docNode.child && (docNode.child = []);
-            docNode.child.push(obj);
-            this.forceUpdate();
-        }, this);
-    }
-
-    onSaveForUpdate(treeItem, obj) {
-        Ajax("api/doc/update", {
-            id: treeItem.id,
-            title: obj.title,
-            content: obj.content
-        }, data => {
-            treeItem.title = obj.title;
-            treeItem.content = obj.content;
-            this.forceUpdate();
-        }, this);
-    }
-
-    onEdit(treeItem) {
-        if (treeItem.editor == 2) {
-            showModal(<MarkedDocDialog title="编辑文档" data={treeItem} onOk={this.onSaveForUpdate.bind(this, treeItem)}/>);
-        } else if (treeItem.editor == 1) {
-            showModal(<UEAddDoc title="编辑文档" data={treeItem} onOk={this.onSaveForUpdate.bind(this, treeItem)}/>);
-        }
-    }
-
-    onRemove(treeItem, index) {
-        let {docNode}=this.state;
-        Confirm("确定删除【"+treeItem.title+"】么？",()=>{
-            Ajax("api/doc/del",{
-                id:treeItem.id
-            },data=>{
-                docNode.child.splice(index,1);
-                this.forceUpdate();
-            },this);
-        })
-    }
-
-    addDoc(type) {
-        if (type == "markdown")
-            showModal(<MarkedDocDialog title="新增文档" onOk={this.onSaveMark.bind(this)}/>);
-        else if (type == "ue") {
-            showModal(<UEAddDoc title="新增文档" onOk={this.onSaveUE.bind(this)}/>);
-        }
-    }
-
-    renderHeader() {
-        var {docNode}=this.state;
-        if (docNode) {
-            let child = docNode.child && docNode.child.map(function (v, index) {
-                    return <div key={v.id} className="header-item">
-                        <Link to={"../"+v.id}>{v.title}</Link>
-                        <i className="icon-edit" onClick={this.onEdit.bind(this, v)}/>
-                        <i className="icon-remove" onClick={this.onRemove.bind(this, v, index)}/>
-                    </div>
-                }, this);
-            return <div className="header">{child}</div>
-        }
-    }
-
-    renderContent() {
-        var {docNode}=this.state;
-        if (docNode)
-            return docNode.child && docNode.child.map(function (v) {
-                    var obj = {__html: ""};
-                    if (v.editor == 2) {
-                        obj.__html = Marked(v.content);
-                    } else {
-                        obj.__html = v.content;
-                    }
-                    return <div key={v.id} id={"node" + v.id} className="content-item">
-                        <h1>{v.title}</h1>
-                        <div dangerouslySetInnerHTML={obj}></div>
-                    </div>
-                }, this);
-    }
-
-    renderPaper() {
-        var {docNode}=this.state;
-        if (docNode) {
-            return <div className="pageTitle">
-                <h1>{docNode.title}</h1>
-                <button className="btn btn-primary btn-small m-r" onClick={this.addDoc.bind(this, "ue")}>
-                    <i className="icon-plus"/>创建UEditor
-                </button>
-                <button className="btn btn-primary btn-small m-r" onClick={this.addDoc.bind(this, "markdown")}>
-                    <i className="icon-plus"/>创建markdown
-                </button>
-            </div>
-        } else {
-            return <h1>请选择左侧的文件</h1>
-        }
-    }
-
-    render() {
-        return <div className="subContainer " ref="scrollDiv">
-            <Paper className="markdown_css prePaper">
-                {this.renderPaper()}
-                {this.renderHeader()}
-                {this.renderContent()}
-            </Paper>
-        </div>
-    }
-}
 /***
  * React Component Docs create by ZhangLiwei at 20:21
  */
@@ -248,10 +40,25 @@ var Docs = React.createClass({
             ],
             fileMenu: [
                 {
-                    text: "删除", icon: "icon-remove", click: this.handleRemoveTreeItem
+                    text: "追加任务", icon: "icon-tasks", child:[
+                        {
+                            text:"新建任务",icon:"icon-plus",click:this.handleAddNewTask
+                        },
+                        {
+                            text:"从任务中添加",icon:"icon-tasks", click: this.handleSelectTask
+                        }
+                    ]
                 },
                 {
                     text: "编辑名称", icon: "icon-edit", click: this.handleEditTreeItem
+                },
+                {
+                    text: "删除", icon: "icon-remove", click: this.handleRemoveTreeItem
+                }
+            ],
+            taskMenu:[
+                {
+                    text: "删除", icon: "icon-remove", click: this.handleRemoveTreeItem
                 }
             ],
             mainMenu: [
@@ -263,6 +70,10 @@ var Docs = React.createClass({
                 }
             ]
         }
+    },
+    handleSelectTask:function(){
+        var treeItem = this.opTreeItem;
+        showModal(<TaskSelectDialog docId={treeItem.id} projectId={this.props.projectId} onOk={this.onAddTasksToTree.bind(this,treeItem)}/>);
     },
     handleEditTreeItem: function () {
         var treeItem = this.opTreeItem;
@@ -322,6 +133,10 @@ var Docs = React.createClass({
             },this);
         });
     },
+    handleAddNewTask:function(){
+        var treeItem = this.opTreeItem;
+        showModal(<CreateTask forSelect projectId={this.props.projectId} onSelectOk={this.onAddTaskToTree.bind(this,treeItem)}/>)
+    },
     handleContextMenu: function (e, treeItem) {
         this.opTreeItem = treeItem;
         if (treeItem.id < 0) {
@@ -340,6 +155,35 @@ var Docs = React.createClass({
             treeItem.title = value;
             this.forceUpdate();
         }, this);
+    },
+    onAddTaskToTree:function(treeItem,task){
+        Ajax("api/doc/addTask",{
+            parent:treeItem.id,
+            taskId:task.id,
+            projectId:this.props.projectId
+        },data=>{
+            if(!Array.isArray(treeItem.child)){
+                treeItem.child=[];
+            }
+            treeItem.child.push(task);
+            this.forceUpdate();
+        },this);
+    },
+    onAddTasksToTree:function(treeItem,ids,tasks){
+        this.forceUpdate();
+        Ajax("api/doc/addTasks",{
+            parent:treeItem.id,
+            ids:JSON.stringify(ids),
+            projectId:this.props.projectId
+        },data=>{
+            treeItem.allCount+=tasks.length;
+            tasks.forEach(task=>{
+                if(task.done!=0)
+                    treeItem.doneCount++
+            });
+            EventSpider.trigger("onAddTaskToTree",[treeItem.id]);
+            this.forceUpdate();
+        },this);
     },
     onBeforeSelect: function (treeItem) {
         if (treeItem.type == 2) {
@@ -367,12 +211,14 @@ var Docs = React.createClass({
     },
     render: function () {
         return <Split className="Docs">
-            <HelpMenu noData title={this.props.title} resize desc={this.props.helperText}>
+            <HelpMenu noData title={this.props.title} width={400} resize desc={this.props.helperText}>
                 <Tree data={this.state.treeData}
+                      showComplete={this.props.showComplete}
                       onBeforeSelect={this.onBeforeSelect}
                       onEndEdit={this.handleEndEdit} onContextMenu={this.handleContextMenu}/>
             </HelpMenu>
             <Router>
+                <Route path="task/:id" component={TaskDetail} projectId={this.props.projectId}/>
                 <Route path="file/:id/:item" component={DocPaper} projectId={this.props.projectId}/>
                 <Route path="*" component={DocPaper} projectId={this.props.projectId}/>
             </Router>
