@@ -2,26 +2,7 @@
  * React Component AutoEdit create by ZhangLiwei at 8:07
  */
 var React = require("react");
-var Marked=require("marked");
-var hljs = require('../marked/highlight');
-Marked.setOptions({
-    renderer: new Marked.Renderer({
-        highlight: function(code, lang) {
-            if (lang)
-                return hljs.highlightAuto(code, [lang]).value;
-            else
-                return hljs.highlightAuto(code).value;
-        }
-    }),
-    gfm: true,
-    breaks: true,
-    highlight: function(code, lang) {
-        if (lang)
-            return hljs.highlightAuto(code, [lang]).value;
-        else
-            return hljs.highlightAuto(code).value;
-    }
-});
+var Marked = require('../marked/markedFunc');
 
 var AutoEdit = React.createClass({
     propTypes:{
@@ -120,6 +101,14 @@ var AutoEdit = React.createClass({
         if(this.state.preview){
             e.stopPropagation();
             e.preventDefault();
+        }
+    },
+    componentWillReceiveProps(nextProps){
+        if(nextProps.value){
+            this.setState({
+                value:nextProps.value||"",
+                html:{__html:Marked(nextProps.value||"")},
+            });
         }
     },
     componentDidUpdate:function(){
