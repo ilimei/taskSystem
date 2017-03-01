@@ -10,7 +10,8 @@ var HelperMenu = React.createClass({
     propTypes:{
         title:_InternalPropTypes.string,
         desc:_InternalPropTypes.string,
-        noData:_InternalPropTypes.boolean
+        noData:_InternalPropTypes.boolean,
+        width:React.PropTypes.number
     },
     getInitialState:function(){
         return {
@@ -53,7 +54,7 @@ var HelperMenu = React.createClass({
     },
     render: function () {
         if(this.props.resize){
-            return <ResizeBox width={250} className="HelperMenu">
+            return <ResizeBox width={this.props.width||250} className="HelperMenu">
                 {this.renderHeader()}
                 {this.renderItem()}
                 {this.renderChildren()}
