@@ -19,12 +19,16 @@ class CreateTask extends React.Component {
     /***
      * default props value
      */
-    props = {}
+    static defaultProps = {}
 
     /***
      * props types for helper text
      */
-    static propTypes = {}
+    static propTypes = {
+        forSelect:React.PropTypes.bool,
+        projectId:React.PropTypes.string,
+        onSelectOk:React.PropTypes.func
+    }
 
     constructor(props) {
         super(props);
@@ -83,7 +87,7 @@ class CreateTask extends React.Component {
 
     ok(){
         var data=JSON.stringify(this.state.tips.map(v=>v.id));
-        Ajax("api/task/addTaskAndTip",{
+        var post={
             data:data,
             projectId:this.state.projectId,
             executor:this.state.executor,
@@ -91,10 +95,16 @@ class CreateTask extends React.Component {
             end_time:this.state.end_time,
             name:this.state.name,
             desc:this.state.desc,
-        },data=>{
+        }
+        Ajax("api/task/addTaskAndTip",post,data=>{
             this.cancel();
-            LinkFunc("/project/"+this.state.projectId+"/tasks/detail/"+data.result.insertId);
-        });
+            if(this.props.forSelect){
+                post.id=data.result.insertId;
+                callAsFunc(this.props.onSelectOk,[post]);
+            }else {
+                LinkFunc("/project/" + this.state.projectId + "/tasks/detail/" + data.result.insertId);
+            }
+        },this);
     }
 
     renderTips(){
@@ -113,7 +123,7 @@ class CreateTask extends React.Component {
                 </div>
                 <div className="set">
                     <div className="title">所属项目</div>
-                    <ProjectDropSearch onSelect={this.onSelectProject}/>
+                    <ProjectDropSearch noDrop={this.props.forSelect} projectId={this.props.projectId} onSelect={this.onSelectProject}/>
                     <div className="title">执行者</div>
                     <UserDropSearch onSelect={this.onSelectUsers} projectId={this.state.projectId} showName/>
                     <div className="title">紧急程度</div>
