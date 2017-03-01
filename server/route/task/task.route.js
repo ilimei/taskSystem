@@ -4,6 +4,7 @@ const co = require("co");
 const Project = require("../../modal/Project.modal.js");
 const ProjectUser = require("../../modal/ProjectUser.modal");
 const TaskModal = require("../../modal/Task.modal");
+const Doc = require("../../modal/Doc.modal");
 const User = require("../../modal/User.modal.js");
 const Tip=require("../../modal/Tip.modal.js")
 const TipTask=require("../../modal/TipTask.modal");
@@ -24,6 +25,9 @@ router.use(function (req, res, next) {
     }
 });
 
+/**
+ * @mark 单个获取任务
+ */
 router.post("/getTask",function(req,res){
     co(function*() {
         let task = new TaskModal();
@@ -54,6 +58,9 @@ router.post("/getTask",function(req,res){
     });
 });
 
+/***
+ * @mark 获取项目的所有任务
+ */
 router.post("/listProject", function (req, res) {
     co(function*() {
         var page = parseInt(req.body.page);//第几页 从1开始
@@ -160,6 +167,132 @@ router.post("/listProject", function (req, res) {
     });
 });
 
+/**
+ * @mark 给文档页面开个接口
+ */
+router.post("/listProjectForDoc",function(req,res){
+    co(function*() {
+        var page = parseInt(req.body.page);//第几页 从1开始
+        var rows = parseInt(req.body.rows);//每页多少个
+        var docId=req.body.docId;
+        var docTaskQuery=new Doc().find("editor").where({parent:docId,type:4});
+        let projectId = req.body.projectId;
+        let queryType = req.body.type;
+        let filter=req.body.filter;
+        let task = new TaskModal();
+        let userId = req.session.userid;
+        switch (queryType) {
+            case "all": {
+                let query = task.find().where({
+                    project: projectId,
+                    done:filter==-1?null:filter
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc","update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+            case "done": {
+                let query = task.find().where({
+                    project: projectId,
+                    done: 1
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc", "update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+            case "pending": {
+                let query = task.find().where({
+                    project: projectId,
+                    done: 0
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc", "update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+            case "overdue": {
+                let query = task.find().where({
+                    project: projectId,
+                    end_time: ["<", new Date().getTime() + ""],
+                    done: 0
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc", "update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+            case "created": {
+                let query = task.find().where({
+                    creator: userId,
+                    project: projectId,
+                    done:filter==-1?null:filter
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc", "update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+            default: {
+                let query = task.find().where({
+                    project: projectId,
+                    executor: new User().find(["id"]).where({name: queryType}),
+                    done:filter==-1?null:filter
+                }).where({
+                    id:["not in",docTaskQuery]
+                }).orderBy(["done asc","weight desc", "update_time"], true);
+                return yield [
+                    query.count(),
+                    query.offset((page - 1) * rows).limit(rows).all()
+                ];
+            }
+        }
+    }).then(function (data) {
+        var [count,re]=data;
+        var map = re.map(function (v) {
+            return co(function*() {
+                let [creator, executor, project,tips]=yield [new User().find().where({
+                    id: v.creator
+                }).one(true), new User().find().where({
+                    id: v.executor
+                }).one(true), new Project().find().where({
+                    id: v.project
+                }).one(true),new Tip().find().where({
+                    id:new TipTask().find(["tip_id"]).where({
+                        task_id:v.id
+                    })
+                }).all()];
+                v.creator = creator;
+                v.executor = executor;
+                v.project = project;
+                v.tips=tips;
+                return v;
+            });
+        });
+        map.unshift(count);
+        return Promise.all(map);
+    }).then(function (data) {
+        var count = data.shift();
+        res.json({success: true, result: data, count: count});
+    }).catch(err => {
+        console.error(err);
+    });
+});
+
+/***
+ * @mark 获取任务的所有标签
+ */
 router.post("/listTip", function (req, res) {
     co(function*() {
         var page = parseInt(req.body.page);//第几页 从1开始
@@ -209,6 +342,9 @@ router.post("/listTip", function (req, res) {
     });
 });
 
+/***
+ * @mark 获取用户所有的任务
+ */
 router.post("/listUser", function (req, res) {
     co(function*() {
         var page = parseInt(req.body.page);//第几页 从1开始
@@ -309,6 +445,9 @@ router.post("/listUser", function (req, res) {
     });
 });
 
+/***
+ * @mark 更新任务
+ */
 router.post("/update", function (req, res) {
     co(function*() {
         let task = new TaskModal();
@@ -337,6 +476,9 @@ router.post("/update", function (req, res) {
     });
 });
 
+/**
+ * @mark 添加任务
+ */
 router.post("/add", function (req, res) {
     co(function*() {
         let task = new TaskModal();
@@ -361,6 +503,9 @@ router.post("/add", function (req, res) {
     });
 });
 
+/**
+ * @mark 添加任务同时添加标签
+ */
 router.post("/addTaskAndTip",function(req,res){
     var db=new DB(App.dbPool);
     co(function*() {
@@ -378,9 +523,11 @@ router.post("/addTaskAndTip",function(req,res){
         task.desc = req.body.desc;
         db.startTransaction();
         var data=yield task.insert(db);
-        yield new Query(db).insert(TipTask).values(ids.map(v=>{
-            return {task_id:data.insertId,tip_id:v}
-        })).exec();
+        if(ids.length) {
+            yield new Query(db).insert(TipTask).values(ids.map(v => {
+                return {task_id: data.insertId, tip_id: v}
+            })).exec();
+        }
         task.id=data.insertId;
         return [task,data];
     }).then(function ([task,data]) {
@@ -395,6 +542,9 @@ router.post("/addTaskAndTip",function(req,res){
     });
 });
 
+/**
+ * @mark 删除项目
+ */
 router.post("/remove", function (req, res) {
     co(function*() {
         let task = new TaskModal();
