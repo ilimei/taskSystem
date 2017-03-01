@@ -35,47 +35,48 @@ class TaskLog extends React.Component {
         switch (log.type) {
             case 2:
                 icon = "icon-user";
-                color="#00b5ad";
-                textColor="#fff";
+                color = "#00b5ad";
+                textColor = "#fff";
                 break;
             case 3:
                 icon = "icon-time";
-                color="#e07b53";
-                textColor="#fff";
+                color = "#e07b53";
+                textColor = "#fff";
                 break;
             case 4:
                 icon = "coding-exclamation";
-                color="#564f8a";
-                textColor="#fff";
+                color = "#564f8a";
+                textColor = "#fff";
                 break;
             case 5:
                 icon = "icon-flag";
-                color="#d95c5c";
-                textColor="#fff";
+                color = "#d95c5c";
+                textColor = "#fff";
                 break;
             case 6:
                 icon = "icon-pencil";
-                color="#3b83c0";
-                textColor="#fff";
+                color = "#3b83c0";
+                textColor = "#fff";
                 break;
             case 7:
                 icon = "icon-bullhorn";
-                color="#f2c61f";
-                textColor="#fff";
+                color = "#f2c61f";
+                textColor = "#fff";
                 break;
         }
-        return <span className="log-icon" style={{background:color,color:textColor}}>
+        return <span className="log-icon" style={{background: color, color: textColor}}>
                 <i className={icon}/>
         </span>
     }
 
     renderItem(log, index) {
-
         var user = this.state.userMap[log.user_id];
+        var toUser = this.state.userMap[log.to_id];
         return <div className="logItem" key={log.id}>
             {this.renderIcon(log)}
             <span className="user">{user && user.nick_name }</span>
             <span className="text">{log.desc}</span>
+            {log.type == 2 ? <span className="user">{ toUser && toUser.nick_name }</span> : ""}
             <span className="time">{new Date(parseInt(log.create_time)).Format("yyyy-MM-dd HH:mm:ss")}</span>
         </div>
     }
