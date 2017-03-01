@@ -116,14 +116,22 @@ var TaskDetail = React.createClass({
             }
         },this);
     },
-    componentDidMount:function(){
+    load:function(id){
         Ajax("api/task/getTask",{
-            id:this.props.routeParam.id
+            id:id
         },function(data){
             this.setState({task:data.result,
                 project:data.result.project,name:data.result.name,
-            content:data.result.desc});
+                content:data.result.desc});
         },this);
+    },
+    componentDidMount:function(){
+        this.load(this.props.routeParam.id);
+    },
+    componentWillReceiveProps(nextProps){
+        if(nextProps.routeParam.id!=this.props.routeParam.id){
+            this.load(nextProps.routeParam.id);
+        }
     },
     renderLoader(){
         return <div><i className="icon-spin icon-spinner"/>数据加载中..</div>
