@@ -153,7 +153,10 @@ g.makeLen=function(v,len){
 }
 
 /***
- * 类型判断
+ *
+ * @mark test
+ *
+ * @mark 类型判断
  * @type {{isString: Window._.isString, isArray: Window._.isArray, isRegExp: Window._.isRegExp, isObject: Window._.isObject, isFunction: Window._.isFunction, extend: Window._.extend}}
  * @private
  */
@@ -282,3 +285,6 @@ const param=(function(){
 g.getUrlParam=function(name){
     return param[name];
 }
+
+import AutoBindFunc from "./lib/autoBind";
+g.ComponentConstrutorAutoBind=AutoBindFunc;
