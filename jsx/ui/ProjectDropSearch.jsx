@@ -20,10 +20,12 @@ var ProjectDropSearch = React.createClass({
             data.result.forEach(function(v){
                 map[v.id]=v;
             });
-            var selProject;
+            var selProject=map[this.props.projectId];
             if(data.result.length){
-                selProject=data.result[0];
-                callAsFunc(this.props.onSelect,[selProject]);
+                if(!selProject) {
+                    selProject = data.result[0];
+                }
+                callAsFunc(this.props.onSelect, [selProject]);
             }
             this.setState({data:data.result,selProject:selProject});
         },this);
