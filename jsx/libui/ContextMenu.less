@@ -12,6 +12,7 @@
 		padding:2px 4px;
 		font-size: 13px;
 		cursor:default;
+		position: relative;
 		&.disable{
 			color:#ccc;
 			&:hover{
@@ -20,6 +21,9 @@
 		}
 		&:hover{
 			background: rgba(0,0,0,0.05);
+			.children{
+				display: block;
+			}
 		}
 		.icon{
 			display: inline-block;
@@ -31,5 +35,16 @@
 		.text{
 			color:#000;
 		}
+	}
+	.children{
+		display: none;
+		top:0;
+		left:100%;
+		position: absolute;
+		background: #fff;
+		width:204px;
+		border:1px solid #ccc;
+		padding:4px 0;
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 	}
 }

@@ -25,32 +25,49 @@ var ContextMenu = React.createClass({
         callAsFunc(v.click,[e]);
         this.setState({show:false});
     },
-    renderItem:function(){
-        return this.state.data.map((v,index)=>{
+    renderItems:function(items){
+        return items.map((v,index)=>{
             return <div className="item" key={index} onClick={this.onClick.bind(this,v)}>
                 <span className="icon"><i className={v.icon}/></span>
                 <span className="text">{v.text}</span>
             </div>
+        });
+    },
+    renderItem:function(){
+        return this.state.data.map((v,index)=>{
+            var children=undefined;
+            if(v.child){
+                children=<div className="children">
+                    {this.renderItems(v.child)}
+                </div>
+            }
+            return <div className="item" key={index} onClick={this.onClick.bind(this,v)}>
+                <span className="icon"><i className={v.icon}/></span>
+                <span className="text">{v.text}</span>
+                {children}
+            </div>
         },this);
+    },
+    fixTargetPosition(target){
+        var {offsetWidth,offsetHeight,offsetLeft,offsetTop}=target;
+        var fix=false,fixLeft=offsetLeft,fixTop=offsetTop;
+        if(fixLeft+offsetWidth>ClientWidth){
+            fix=true;
+            fixLeft=fixLeft-offsetWidth;
+        }
+        if(fixTop+offsetHeight>ClientHeight){
+            fix=true;
+            fixTop=fixTop-offsetHeight;
+        }
+        if(fix) {
+            target.style.left = fixLeft + "px";
+            target.style.top = fixTop + "px";
+        }
     },
     componentDidUpdate:function(){
         if(this.state.show){
-            var {left,top}=this.state;
             var target=this.refs["menu"];
-            var {offsetWidth,offsetHeight}=target;
-            var fix=false,fixLeft=left,fixTop=top;
-            if(left+offsetWidth>ClientWidth){
-                fix=true;
-                fixLeft=left-offsetWidth;
-            }
-            if(top+offsetHeight>ClientHeight){
-                fix=true;
-                fixTop=top-offsetHeight;
-            }
-            if(fix) {
-                target.style.left = fixLeft + "px";
-                target.style.top = fixTop + "px";
-            }
+            this.fixTargetPosition(target);
         }
     },
     renderContextMenu(){
