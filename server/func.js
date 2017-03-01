@@ -60,3 +60,14 @@ global.Format=function(date,fmt){
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
     return fmt;
 }
+
+
+const toString=Object.prototype.toString;
+/***
+ * 判断函数是否是Generator函数
+ * @param func
+ * @return {boolean}
+ */
+global.isGenerator=function(func){
+    return toString.call(func)=="[object GeneratorFunction]";
+}
