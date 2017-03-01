@@ -9,26 +9,7 @@ import Split from "../../../ui/Split";
 import CodeEditor from "../../../codeMirror/CodeEditor";
 import "../../../codeMirror/markdown";
 import ResizeBox from "../../../libui/ResizeBox";
-import Marked from "marked"
-import hljs  from '../../../marked/highlight';
-Marked.setOptions({
-    renderer: new Marked.Renderer({
-        highlight: function (code, lang) {
-            if (lang)
-                return hljs.highlightAuto(code, [lang]).value;
-            else
-                return hljs.highlightAuto(code).value;
-        }
-    }),
-    gfm: true,
-    breaks: true,
-    highlight: function (code, lang) {
-        if (lang)
-            return hljs.highlightAuto(code, [lang]).value;
-        else
-            return hljs.highlightAuto(code).value;
-    }
-});
+import Marked  from '../../../marked/markedFunc';
 
 class MarkedDocDialog extends React.Component {
 
