@@ -19,12 +19,12 @@ var Link=React.createClass({
         _matchPath:React.PropTypes.string,
         _routeUnMatchPath:React.PropTypes.array
     },
-    shouldComponentUpdate(){
-        return RouterLib.shouldUpdate;
-    },
     jumpTo:function(){
-        history.pushState(cache.state, title,"/"+this.context._matchPath+"/"+this.props.to);
-        EventSpider.trigger("urlChange");
+        if(location.pathname!="/"+this.context._matchPath+"/"+this.props.to) {
+            history.pushState(cache.state, title, "/" + this.context._matchPath + "/" + this.props.to);
+            EventSpider.trigger("urlChange");
+        }
+
     },
     render:function(){
         RouterLib.DEBUG=this.props.DEBUG;
