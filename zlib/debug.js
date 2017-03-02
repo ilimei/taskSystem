@@ -22,3 +22,4 @@ exports.inspect = function(obj, depth) {
 
 exports.log=log;
 exports.info=info;
+exports.error=error;
