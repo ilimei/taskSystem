@@ -1,6 +1,7 @@
 const path = require("path");
 const buildEnv=require("./zlib/buildEnv");
-const gulp=require("gulp")
+const gulp=require("gulp");
+const debug=require("./zlib/debug");
 
 buildEnv.config = {
     appName: "taskSystem",
@@ -15,42 +16,53 @@ buildEnv.config = {
 }
 
 if (process.argv[2] == "start") {
-    console.info("开启服务");
+    debug.info("开启服务");
     require("./zlib/tasks/startServer");
     gulp.start("startServer");
 } else if (process.argv[2] == "stop") {
-    console.info("开始停止服务");
+    debug.info("开始停止服务");
     require("./zlib/tasks/stopServer");
     gulp.start("stopServer");
 } else if (process.argv[2] == "cleanBuild") {
-    console.info("清理编译目录");
+    debug.info("清理编译目录");
     require("./zlib/tasks/cleanBuild");
     gulp.start("cleanBuild");
 } else if (process.argv[2] == "makePub") {
-    console.info("生成发布资源");
+    debug.info("生成发布资源");
     buildEnv.config.debug=false;
     require("./zlib/tasks/pub");
     gulp.start("pub");
 } else if(process.argv[2]=="eslint"){
-    console.info("检查代码");
+    debug.info("检查代码");
     buildEnv.config.debug=false;
     require("./zlib/tasks/eslint");
     gulp.start("lint");
 } else {
-    console.info("开始构建项目");
+    debug.info("开始构建项目");
+    let recordClosable;
     require("./zlib/tasks/build");
-    gulp.task("refresh",["build"],function(cb){
+    gulp.task("refresh",function(cb){
+        if(recordClosable.stop){
+            recordClosable.stop(null,true);
+        }
+        recordClosable = gulp.start("refreshServer");
+        cb();
+    });
+
+    gulp.task("refreshServer",["build"],function(cb){
         App.refreshClient();
+        debug.info("success");
         cb();
     });
 
     gulp.task("startMyServer",["build"],function(cb){
         require("./server/app");
+        debug.info("success");
         cb();
     });
 
     gulp.task("watchChange", function () {
-        gulp.start("startMyServer");
+        recordClosable=gulp.start("startMyServer");
         gulp.watch(['jsx/**/*', 'jsx/**/*.less',"less/base/*.less"], ['refresh']);
     });
     gulp.start("watchChange");
