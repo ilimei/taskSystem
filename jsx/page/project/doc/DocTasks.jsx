@@ -86,7 +86,6 @@ class DocTasks extends React.Component {
     renderTaskItems(){
         return this.state.tasks.map(function (v, index) {
             return <TaskItem key={v.id} task={v.task}
-                             forSelect
                              onDel={this.onDelTask.bind(this,v)}
                              isSelect={v.task.done!=0}/>
         },this);
