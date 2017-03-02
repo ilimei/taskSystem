@@ -218,7 +218,7 @@ var Docs = React.createClass({
                       onEndEdit={this.handleEndEdit} onContextMenu={this.handleContextMenu}/>
             </HelpMenu>
             <Router>
-                <Route path="task/:id" component={TaskDetail} projectId={this.props.projectId}/>
+                <Route path="file/:docid/detail/:id" component={TaskDetail} projectId={this.props.projectId}/>
                 <Route path="file/:id/:item" component={DocPaper} projectId={this.props.projectId}/>
                 <Route path="*" component={DocPaper} projectId={this.props.projectId}/>
             </Router>
