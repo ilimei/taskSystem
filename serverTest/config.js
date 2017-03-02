@@ -14,3 +14,7 @@ module.exports={
         return pool;
     }
 }
+
+global.getLogger = function (name) {
+    return require("log4js").getLogger(name);
+};
