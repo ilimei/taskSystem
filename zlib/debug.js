@@ -4,19 +4,21 @@
 'use strict';
 
 var diagnostics = process.env.MBUILD_DIAGNOSTICS;
+const error=console.error.bind(console);
+const log=console.log.bind(console);
+const info=console.info.bind(console);
 
 function inspect(obj, depth) {
     return require('util').inspect(obj, false, depth || 5, true);
 }
 
 exports = module.exports = function debug() {
-    if (diagnostics) console.error.apply(console, arguments);
+    if (diagnostics) error.apply(console, arguments);
 }
 
 exports.inspect = function(obj, depth) {
-    if (diagnostics) console.error(inspect(obj, depth));
+    if (diagnostics) error(inspect(obj, depth));
 }
 
-exports.log=function log(){
-    console.log.apply(console, arguments);
-}
+exports.log=log;
+exports.info=info;

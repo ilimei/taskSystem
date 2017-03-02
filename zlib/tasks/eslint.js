@@ -4,9 +4,10 @@
 const gulp = require("gulp");
 const buildEnv = require("../buildEnv");
 const eslint=require("gulp-eslint");
+const {info}=require("../debug");
 
 gulp.task('lint', () => {
-    console.info("开始检测代码")
+    info("开始检测代码")
     // ESLint ignores files with "node_modules" paths.
     // So, it's best to have gulp ignore the directory as well.
     // Also, Be sure to return the stream from the task;

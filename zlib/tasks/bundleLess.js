@@ -8,6 +8,7 @@ const cache = require("../CacheTree");
 const debug = require("../debug.js");
 let less = require("less");
 const fs = require("fs");
+const {info,error}=debug;
 
 require("./bundleJS");
 
@@ -62,12 +63,12 @@ const BundleLess = function () {
             }, function (e, output) {
                 if (e) {
                     let startLine = e.line - 1;
-                    console.error("\t" + e.filename);
+                    error("\t" + e.filename);
                     e.extract = e.extract.map(function (v) {
                         return "\t\t" + (startLine++) + ":" + v;
                     });
                     e.extract.splice(2, 0, "\t\t  " + " ".repeat(e.column) + "^:" + e.message);
-                    console.error(e.extract.join("\n"));
+                    error(e.extract.join("\n"));
                     cb(e);
                 } else {
                     file.contents = new Buffer(output.css);
@@ -81,7 +82,7 @@ const BundleLess = function () {
 };
 
 gulp.task("bundleLess", ["bundleJS"], function () {
-    console.info("start task bundleLess");
+    info("start task bundleLess");
     buildEnv.mkDirsSync(buildEnv.buildPath+"/less/outless");
     return gulp.src(buildEnv.buildPath + "/js/*.js")
         .pipe(BundleLess())

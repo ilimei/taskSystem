@@ -4,6 +4,7 @@
 const gulp = require("gulp");
 const buildEnv = require("../buildEnv");
 import {spawn} from "child_process";
+const {log,info,error} =require("../debug");
 
 const port=buildEnv.config.port;
 
@@ -35,13 +36,13 @@ gulp.task("startServer", ["build"], function () {
         } else {
             if (process.platform == "win32") {
                 spawn("start chrome --url http://localhost:"+port+"  --disable-web-security --user-data-dir=" + path.resolve("../chromeTemp")).on("error", function (err) {
-                    console.error(err);
+                    error(err);
                 });
                 // cmd("start chrome http://localhost:8808 -disable-web-security -user-data-dir="+path.resolve("../chromeTemp"),{shell:"/c"});
             } else {
                 spawn("open -a '/Applications/Google Chrome.app' --args -disable-web-security -user-data-dir=" + path.resolve("../chromeTemp") + " --url http://localhost:"+port, function (err) {
                     if (err)
-                        console.error(err);
+                        error(err);
                 });
             }
         }
@@ -54,27 +55,27 @@ gulp.task("startServer", ["build"], function () {
     });
 
     io.on('connection', function (socket) {
-        console.log('has connected');
+        log('has connected');
         clients.push(socket);
     });
 
     http.on('error', function () {
         require('http').get("http://localhost:"+port+"/api/refresh", function (res) {
-            console.info(res.statusCode);
+            info(res.statusCode);
         });
     });
     http.listen(port, function () {
-        console.log('listening on *:'+port);
+        log('listening on *:'+port);
         if (process.platform == "win32") {
             spawn("start chrome --url http://localhost:"+port+"  --disable-web-security --user-data-dir=" + path.resolve("../chromeTemp")).on("error", function (err) {
-                console.error(err);
+                error(err);
             });
         } else {
             spawn("open -a '/Applications/Google Chrome.app' --args -disable-web-security -user-data-dir=" + path.resolve("../chromeTemp") + " --url http://localhost:8808", function (err) {
                 if (err)
-                    console.error(err);
+                    error(err);
             });
         }
-        console.info("open the http://localhost:"+port);
+        info("open the http://localhost:"+port);
     });
 });

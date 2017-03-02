@@ -4,6 +4,7 @@
 const gulp = require("gulp");
 const buildEnv = require("../buildEnv");
 var fs = require("fs");
+const {error}=require("../debug");
 
 
 gulp.task("pubDoc", function (cb) {
@@ -18,7 +19,7 @@ gulp.task("pubDoc", function (cb) {
                 let str = md5sum.digest('hex');
                 resolve(str);
             }).on("error",function(err){
-                console.error(err);
+                error(err);
                 reject(err);
             });
         });

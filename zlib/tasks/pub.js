@@ -7,6 +7,7 @@ const through2 = require("through2");
 const fs = require("fs");
 const md5Tree=require("../Md5Tree");
 require("./pubJSCSS");
+const {info} =require("../debug");
 
 let makePubDoc = function ($) {
     return through2.obj(function (file, enc, cb) {
@@ -38,7 +39,7 @@ let makePubDoc = function ($) {
 }
 
 gulp.task("pub", ["pubJSCSS"], function (cb) {
-    console.info("start task pub");
+    info("start task pub");
     let jsdom = require("jsdom");
     let html = fs.readFileSync(buildEnv.buildPath+"/out/pub.html").toString();
     jsdom.env(html, function (err, window) {

@@ -59,8 +59,8 @@ let BundleJs = function (bool) {
         b.on('file', function (childFile, id, parent) {
             if (bool) {
                 if (childFile.endsWith(".css")) {
-                    console.info(childFile, id);
-                    console.info(b._ignore);
+                    debug.info(childFile, id);
+                    debug.info(b._ignore);
                 }
                 cache.addCommonJS(childFile, id, parent);
             }
@@ -82,7 +82,7 @@ let BundleJs = function (bool) {
             }
         }
         b.bundle().on('error', function (err) {
-            console.error(err);
+            debug.error(err);
         }).pipe(file.contents);
         file._ignore = b._ignore;//记录ignore文件
         cb(null, file);
@@ -118,7 +118,7 @@ let BundleCommon = function () {
                 b.require(cache._data.commonJS)
                     .bundle()
                     .on('error', function (err) {
-                        console.error(err);
+                        debug.error(err);
                         cb(err);
                     })
                     .pipe(file.contents);
@@ -130,7 +130,7 @@ let BundleCommon = function () {
 
 
 gulp.task("commonJS", ["transformJSX"], function (cb) {
-    console.info("start task commonJS");
+    debug.info("start task commonJS");
     let stream = gulp.src(buildEnv.buildPath + "/js/common.js")
         .pipe(BundleJs(true))
         .pipe(BundleCommon())
@@ -146,7 +146,7 @@ gulp.task("commonJS", ["transformJSX"], function (cb) {
 });
 
 gulp.task("bundleJS", ["commonJS"], function () {
-    console.info("start task bundleJS");
+    debug.info("start task bundleJS");
     let stream = gulp.src(buildEnv.buildPath + "/js/*.js")
         .pipe(BundleJs())
         .pipe(gulp.dest(buildEnv.buildPath + "/out/appjs"))

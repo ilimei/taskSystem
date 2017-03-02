@@ -37,7 +37,7 @@ var TransformJSX = function () {
                     me.push(file);
                     cb();
                 } catch (e) {
-                    console.error(err);
+                    debug.error(err);
                     cb();
                 }
             });
@@ -49,7 +49,7 @@ var TransformJSX = function () {
 
 
 gulp.task("transformJSX", ["copyJsFromJSXDir"], function () {
-    console.info("start task transformJSX");
+    debug.info("start task transformJSX");
     let stream = gulp.src(buildEnv.buildPath + "/jsx/**/*.jsx")
         .pipe(TransformJSX())
         .pipe(gulp.dest(buildEnv.buildPath + '/js'))
