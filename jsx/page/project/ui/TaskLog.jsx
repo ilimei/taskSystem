@@ -31,7 +31,6 @@ class TaskLog extends React.Component {
 
     renderIcon(log) {
         var color = "#ccc", icon = "icon-plus", textColor: "#333";
-        console.dir(log.type);
         switch (log.type) {
             case 2:
                 icon = "icon-user";
@@ -91,7 +90,6 @@ class TaskLog extends React.Component {
             Ajax("api/log/getTaskLog", {
                 taskId: taskId
             }, data => {
-                console.dir(data);
                 this.setState({data: data.data});
             }, this);
             cacheAjax("api/project/listUser", {
