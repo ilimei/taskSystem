@@ -3,17 +3,18 @@
  */
 var co=require("co");
 const slice=Array.prototype.slice;
+const Router=require("express").Router;
 
 class RouterBind{
     constructor(){
-        this._router=require("express").Router();
+        this._router=Router();
     }
 
     _makeCallbackCo(callback){
         if(isGenerator(callback)) {
             let _this=this;
-            return function (req, res) {
-                co(callback.bind(_this, req, res))
+            return function (req, res,next) {
+                co(callback.bind(_this, req, res,next))
                     .then(_this.success.bind(this, res))
                     .catch(_this.error.bind(this, res));
             }
@@ -36,7 +37,9 @@ class RouterBind{
     }
 
     success(res,data){
-        res.json({success:true,data:data});
+        if(data) {//不返回值时不做处理
+            res.json({success: true, data: data});
+        }
     }
 
     error(res,e){
