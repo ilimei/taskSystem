@@ -232,7 +232,6 @@ var ReactClassInterface = {
  */
 export default function(comp){
     const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(comp));
-    console.dir(properties)
     properties.forEach(method=>{
         const isFunction = typeof comp[method] == "function";
         const isReactClassMethod = ReactClassInterface[method] != undefined;

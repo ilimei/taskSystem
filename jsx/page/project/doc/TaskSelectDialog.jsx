@@ -23,7 +23,7 @@ class TaskSelectDialog extends React.Component {
     static propTypes = {
         projectId: oneOfType([React.PropTypes.string, React.PropTypes.number]),
         onOk:React.PropTypes.func,
-        docId:oneOfType(React.PropTypes.string,React.PropTypes.number)
+        docId:oneOfType([React.PropTypes.string,React.PropTypes.number])
     }
 
     state = {

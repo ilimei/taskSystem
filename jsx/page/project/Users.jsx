@@ -152,7 +152,6 @@ var Users = React.createClass({
             userId=ProjectMap[this.props.projectId].creator;
         return this.state.data.map(function(v){
             var unSel=userId==v.id;
-            console.info(unSel,userId);
             var cls = CS({
                 "UserItem": true,
                 "active": this.isSel(v),

@@ -79,9 +79,7 @@ class MarkedDocDialog extends React.Component {
                     }else{
                         alert(data.result)
                     }
-                    console.dir(data);
                 }).catch(function(e){
-                console.dir(e);
             });
         }
         e.preventDefault();

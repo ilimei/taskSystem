@@ -56,7 +56,6 @@ var AutoEdit = React.createClass({
         var me=this;
         var clipboard = e.clipboardData;
         var type = clipboard.items[0].type;
-        console.dir(type);
         if (type.match(/image/)) {
             var blob = clipboard.items[0].getAsFile();
             var formData=new FormData();
@@ -71,16 +70,13 @@ var AutoEdit = React.createClass({
                     }else{
                         alert(data.result)
                     }
-                    console.dir(data);
-                }).catch(function(e){
-                console.dir(e);
-            });
+                }).catch(function(e){});
         }
         e.stopPropagation();
     },
     saveValue:function(e){
         var editor=e.target;
-        editor.style.height="200px";
+        editor.style.height=this.props.minHeight+"px";
         var scrollHeight=editor.scrollHeight;
         if(!this.props.noLimitHeight&&scrollHeight>400){
             scrollHeight=400;

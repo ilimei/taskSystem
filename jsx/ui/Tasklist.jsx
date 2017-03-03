@@ -1,8 +1,17 @@
 var React = require("react");
 
 var TaskList = React.createClass({
+    getDefaultProps(){
+        return {
+            textField:"text",
+            iconField:"icon"
+        }
+    },
     propTypes:{
-        data:React.PropTypes.array
+        data:React.PropTypes.array,
+        textField:React.PropTypes.string,
+        iconField:React.PropTypes.string,
+        onClick:React.PropTypes.func
     },
     getInitialState:function(){
         return {
@@ -21,6 +30,10 @@ var TaskList = React.createClass({
             callAsFunc(v.click);
             return;
         }
+        if(this.props.onClick){
+            callAsFunc(this.props.onClick,[v]);
+            return;
+        }
         if(this.select){
             this.select.active=false;
         }
@@ -29,7 +42,8 @@ var TaskList = React.createClass({
         this.forceUpdate();//通知组件更新
     },
     renderData:function(){
-        return this.state.data.map(function(v,index){
+        var {textField,iconField}=this.props;
+        return this.props.data.map(function(v,index){
             // var cls="task-item"
             // if(v.active){
             // 	cls=cls+" active";
@@ -39,13 +53,14 @@ var TaskList = React.createClass({
                 "active":v.active
             });
             return <div key={index} onClick={this.jumpToUrl.bind(this,v)} className={cls}>
-                <i className={v.icon}/>{v.text}</div>
+                {v[iconField]&&<i className={v[iconField]}/>}{v[textField]}</div>
         },this);
     },
     render: function() {
         return (
             <div className="TaskList">
                 {this.renderData()}
+                {this.props.children}
             </div>
         );
     }

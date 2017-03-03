@@ -24,7 +24,6 @@ var ListProjects = React.createClass({
     },
     renderUsers:function(){
         var filter=this.state.filter;
-        console.info(filter);
         return this.state.data.map(function(v,index){
             if(v.name.indexOf(filter)>=0) {
                 var cls = CS({

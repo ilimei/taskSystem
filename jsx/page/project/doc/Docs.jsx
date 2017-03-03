@@ -162,10 +162,8 @@ var Docs = React.createClass({
             taskId:task.id,
             projectId:this.props.projectId
         },data=>{
-            if(!Array.isArray(treeItem.child)){
-                treeItem.child=[];
-            }
-            treeItem.child.push(task);
+            treeItem.allCount+=tasks.length;
+            EventSpider.trigger("onAddTaskToTree",[treeItem.id]);
             this.forceUpdate();
         },this);
     },

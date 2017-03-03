@@ -36,7 +36,6 @@ var SelHeadIcon=React.createClass({
         }
     },
     userIcon:function(file){
-        console.dir(file);
         var formData=new FormData();
         formData.append("avatar",file);
         var me=this;

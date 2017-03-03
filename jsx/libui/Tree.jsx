@@ -91,7 +91,6 @@ var TreeNode = React.createClass({
         }
     },
     handleEndEdit: function (treeItem, e) {
-        console.info("???");
         if (e.type == "blur") {
             treeItem.isEdit = false;
             this.forceUpdate();
@@ -129,7 +128,6 @@ var TreeNode = React.createClass({
     },
     renderText: function (treeItem) {
         if (treeItem.isEdit) {
-            console.info(treeItem.isEdit);
             return <input className="editBox"
                           ref="editor"
                           onBlur={this.handleEndEdit.bind(this, treeItem)}
@@ -137,7 +135,10 @@ var TreeNode = React.createClass({
                           onKeyDown={this.handleEndEdit.bind(this, treeItem)}/>
         } else {
             if (this.props.showComplete) {
-                return treeItem.complete + treeItem.title;
+                return (<span>
+                    {treeItem.title}
+                    <span style={{fontWeight:"bold"}}>{treeItem.complete}</span>
+                    </span>);
             }
             return treeItem.title;
         }

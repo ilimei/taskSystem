@@ -16,7 +16,6 @@ var Select2 = React.createClass({
 
 	},
 	changeSearch:function(e){
-		console.info(e.target.value);
 		this.setState({searchText:e.target.value});
 	},	
 	showPanel:function(e){

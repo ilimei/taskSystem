@@ -119,7 +119,6 @@ var Tasks=React.createClass({
         },this);
     },
     renderPageNation:function(){
-        console.info(this.state.total,this.state.rows);
         if(this.state.total>this.state.rows){
             return <div className="pageContainer">
                 <PageNation onSelect={this.changePage} total={this.state.total} rows={this.state.rows} page={this.state.page}/>

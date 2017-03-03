@@ -31,7 +31,6 @@ class DocPaper extends React.Component {
         if(this.state.docNode) {
             let {item}=routeParam;
             let toDiv = document.querySelector("#node"+item);
-            console.info(toDiv);
             let top = 0;
             while (toDiv && toDiv != scrollDiv) {
                 top += toDiv.offsetTop;

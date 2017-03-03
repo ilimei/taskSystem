@@ -19,7 +19,7 @@ var MainMenu = React.createClass({
     },
     renderItem:function(){
         return this.state.data.map(function(v,index){
-            return <Link DEBUG key={index} className="Item" to={v.path} activeClass="active">
+            return <Link key={index} className="Item" to={v.path} activeClass="active">
                 <div className="icon"><i className={v.icon}/></div>
                 <div className="text">{v.text}</div>
             </Link>

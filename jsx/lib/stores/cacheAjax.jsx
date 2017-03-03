@@ -32,7 +32,6 @@ var Cache = {
 
 window.cacheAjax = function (url, param, callback, obj) {
     var key = makeKey(url, param);
-    console.info(key);
     var {state}=Cache;
     if (!Array.isArray(Cache.Listener[key])) {
         Cache.Listener[key] = [];
@@ -67,6 +66,15 @@ function cacheAjaxTrigger(key){
 }
 
 
+window.dataPropArr=function(data,key){
+    if(Array.isArray(data)){
+        return data.map(function(v){
+            return v[key];
+        });
+    }else{
+        throw new TypeError("the first param data must be Array");
+    }
+}
 
 window.dataMapById=function(data,key){
     if(Array.isArray(data)){

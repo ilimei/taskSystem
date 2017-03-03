@@ -68,7 +68,6 @@ var Projects=React.createClass({
         },this);
     },
     render:function(){
-        console.dir(this.props);
         return <div className="Projects autoCell">
             {this.renderHeader()}
             <div className="ProjectContainer">

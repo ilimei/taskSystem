@@ -35,7 +35,6 @@ var ListUsers = React.createClass({
     },
     renderUsers:function(){
         var filter=this.state.filter;
-        console.info(filter);
         return this.state.data.map(function(v,index){
             if(v.email.indexOf(filter)>=0||v.name.indexOf(filter)>=0||v.phone.indexOf(filter)>=0) {
                 var cls = CS({

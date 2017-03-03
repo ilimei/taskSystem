@@ -27,7 +27,6 @@ var FormCheck = React.createClass({
      * @param checkDOM
      */
     register(checkDOM){
-        console.info("has register");
         this.state.checkDOMS.push(checkDOM);
     },
     /***
